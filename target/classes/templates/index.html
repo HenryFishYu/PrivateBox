@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<#import "spring.ftl" as spring/>
+<html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Title</title>
+    <script src="jquery-3.2.1.js"></script>
+    <script>
+     $(document).ready(function(){
+    	 var headers = {};
+	    	headers['X-CSRF-TOKEN'] = "${_csrf.token}";
+	    $("#register-button").click(function(){
+
+	    	$.ajax({
+	    	    url: "/user/register",
+	    	    data:{
+	    	    	username:$("#register-name").val(),
+	    	    	sha512Password:$("#register-password").val(),
+	    	    	invitationCode:$("#register-invitation-code").val()
+	    	    },
+	    	    type: "POST",
+	    	    headers: headers,
+	    	    dataType: "json",
+	    	    success: function(result) {
+	    	    	alert("success");
+	    	    },
+	    	    error:function(result){
+	    	    	alert("error");
+	    	    }
+	    	});
+	    });
+     });
+    </script>
+    <style type="text/css">
+    </style>
+</head>
+<body>
+<div id="login-div">
+<form id="login-form" method="post" action="/">
+<input type="text" name="username" id="login-name" />
+<input type="password" name="password" id="login-password" />
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<input type="submit" id="login-button" value="<@spring.message 'login' />" /> 
+</form>
+</div>
+<#if loginError??>
+<@spring.message 'loginError' />
+<#else>
+</#if>
+<div id="register-div">
+<a href="/?language=en_US">English(US)</a>
+<a href="/?language=zh_CN">简体中文</a> <br />
+<input type="text" id="register-name" />
+<input type="password" id="register-password" />
+<input type="text" id="register-invitation-code" />
+<input type="button" id="register-button" value="<@spring.message 'register' />"/> 
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.SecurityTest</groupId>
+    <artifactId>SecurityTest</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <!-- Spring boot 父引用-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+    </parent>
+<dependencies>
+    <dependency>
+    <groupId>org.springframework.security</groupId>
+    	<artifactId>spring-security-core</artifactId>
+    	<version>5.0.0.RELEASE</version>
+	</dependency>
+	
+
+
+    <!-- 引入freeMarker的依赖包. -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-freemarker</artifactId>
+    </dependency>
+
+
+    <!-- Spring boot 核心web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate</groupId>
+        	<artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>mysql</groupId>
+        	<artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate</groupId>
+        	<artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate</groupId>
+        	<artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate.common</groupId>
+        	<artifactId>hibernate-commons-annotations</artifactId>
+        	<version>5.0.1.Final</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate.javax.persistence</groupId>
+        	<artifactId>hibernate-jpa-2.1-api</artifactId>
+        	<version>1.0.0.Final</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.springframework.data</groupId>
+        	<artifactId>spring-data-jpa</artifactId>
+        	<exclusions>
+        		<exclusion>
+                    <groupId>org.aspectj</groupId>
+ 					<artifactId>aspectjrt</artifactId>
+                </exclusion>
+        	</exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>com.alibaba</groupId>
+        	<artifactId>druid</artifactId>
+        	<version>1.1.1</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+</dependencies>
+
+</project>
