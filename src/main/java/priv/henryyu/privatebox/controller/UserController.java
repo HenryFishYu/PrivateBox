@@ -54,6 +54,7 @@ public class UserController {
 			    .getAuthentication()
 			    .getPrincipal();
 		request.getSession().setAttribute("userDetails", userDetails);
+		//UserDetails sessionUserDetails=(UserDetails) request.getSession().getAttribute("userDetails");
 		request.getSession().removeAttribute("loginError");
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;

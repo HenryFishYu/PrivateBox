@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,7 +35,8 @@ public class IndexController {
 	
 	@RequestMapping("/")
 	public String index() {
-		if(request.getSession().getAttribute("UserDetails")!=null) {
+		//UserDetails userDetails=(UserDetails) request.getSession().getAttribute("userDetails");
+		if(request.getSession().getAttribute("userDetails")!=null) {
 			return "redirect:/user/index";
 		}
 		return "index";

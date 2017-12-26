@@ -15,6 +15,7 @@ import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.RegisterUser;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.model.response.error.ResponseError;
+import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
@@ -31,6 +32,8 @@ import java.util.Locale;
 public class UserService implements UserDetailsService{
 	@Autowired
     UserRepository userRepository;
+	@Autowired
+    RoleRepository roleRepository;
 	@Autowired
 	private MessageSource messageSource;
 	/**
@@ -62,9 +65,10 @@ public class UserService implements UserDetailsService{
 	* @throws Exception
 	*/
 	public ResponseMessage<User> registerUser(RegisterUser registerUser) {
+		checkRoles(roleRepository);
 		ResponseMessage<User> jpaResponseMessage=new ResponseMessage<User>();
 		Locale locale=  LocaleContextHolder.getLocale();
-		User user=newUserTransform(registerUser);
+		User user=newUserTransform(registerUser,roleRepository);
 		if(userRepository.findByUsername(registerUser.getUsername())!=null) {
 			String message = messageSource.getMessage("userAlreadyExist",null,locale);
 			jpaResponseMessage.setMessage(message);
@@ -79,6 +83,28 @@ public class UserService implements UserDetailsService{
 		return jpaResponseMessage;
 		
 	}
+	
+	/**
+	* 初始化权限操作
+	* Authority Initialization 
+	* @param RoleRepository
+	* 
+	* @return null
+	* 
+	* @throws Exception
+	*/
+	
+	public static void checkRoles(RoleRepository roleRepository) {
+		if(roleRepository.findAll()!=null) {
+			return;
+		}
+		Role userRole=new Role();
+		userRole.setName("ROLE_USER");
+		roleRepository.save(userRole);
+		Role adminRole=new Role();
+		userRole.setName("ROLE_ADMIN");
+		roleRepository.save(adminRole);
+	}
 	/**
 	* 将注册请求用户转化为数据库操作用户
 	* Transform RegisterUser to User
@@ -88,13 +114,16 @@ public class UserService implements UserDetailsService{
 	* User
 	* @throws Exception
 	*/
-	public static User newUserTransform(RegisterUser registerUser) {
+	public static User newUserTransform(RegisterUser registerUser,RoleRepository roleRepository) {
 		User user=new User();
 		copyProperties(registerUser, user);
 		user.setPassword(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(registerUser.getSha512Password()));
 		Role role=new Role();
 		role.setName("ROLE_USER");
 		user.addRole(role);
+/*		Role role1=new Role();
+		role1.setName("ROLE_ADMIN");
+		user.addRole(role1);*/
 		return user;
 	}
 }
