@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<#import "../spring.ftl" as spring/>
+
+<#include "../common.ftl">
+
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
+<@authorize ifAnyGranted="ROLE_ADMIN">
+   <a href="../admin/index"><input type="button" value="Admin" /></a>
+</@authorize>
 User Index
 <form action="../logout" method="post">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

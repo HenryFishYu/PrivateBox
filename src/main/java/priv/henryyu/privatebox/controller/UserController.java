@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import priv.henryyu.privatebox.base.BaseComponent;
 import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.RegisterUser;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
@@ -26,9 +27,7 @@ import priv.henryyu.privatebox.service.UserService;
  */
 @Controller
 @RequestMapping("/user")
-public class UserController {
-	@Autowired
-	HttpServletRequest request;
+public class UserController extends BaseComponent{
 	
 	@Autowired
 	UserService userService;
@@ -50,12 +49,7 @@ public class UserController {
 	
 	@RequestMapping("/index")
 	public ModelAndView index() {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-			    .getAuthentication()
-			    .getPrincipal();
-		request.getSession().setAttribute("userDetails", userDetails);
-		//UserDetails sessionUserDetails=(UserDetails) request.getSession().getAttribute("userDetails");
-		request.getSession().removeAttribute("loginError");
+		getSession().removeAttribute("loginError");
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;
 	}

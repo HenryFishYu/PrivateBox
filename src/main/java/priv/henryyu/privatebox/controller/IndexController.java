@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.RequestContextUtils;
+
+import priv.henryyu.privatebox.base.BaseComponent;
 /**
  * IndexController class
  * 
@@ -20,23 +22,18 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  * @version 1.0.0
  */
 @Controller
-public class IndexController {
-	@Autowired
-	HttpServletRequest request;
-	@Autowired
-	private MessageSource messageSource;
+public class IndexController extends BaseComponent{
 	@RequestMapping("/loginerror")
 	public String loginError() {
 		//Locale locale= RequestContextUtils.getLocale(request);
 		//String LoginError=messageSource.getMessage("loginError", null,locale);
-		request.getSession().setAttribute("loginError", "");
+		getSession().setAttribute("loginError", "");
 		return "redirect:/";
 	}
 	
 	@RequestMapping("/")
 	public String index() {
-		//UserDetails userDetails=(UserDetails) request.getSession().getAttribute("userDetails");
-		if(request.getSession().getAttribute("userDetails")!=null) {
+		if(getUser()!=null) {
 			return "redirect:/user/index";
 		}
 		return "index";

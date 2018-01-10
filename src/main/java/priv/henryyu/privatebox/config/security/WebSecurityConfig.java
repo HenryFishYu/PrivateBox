@@ -35,16 +35,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
     	http.authorizeRequests()
     	.antMatchers("/*").permitAll()
+    	.antMatchers("/user/register").permitAll()
     	.antMatchers("/admin/**").hasAnyRole("ADMIN")
     	//hasAnyRole("ADMIN") is the same as has hasAnyAuthority("ROLE_ADMIN")
     	.anyRequest().authenticated()
-        .and().formLogin().loginPage("/").defaultSuccessUrl("/user/index").failureUrl("/loginerror").permitAll()
+        .and().formLogin().loginPage("/").loginProcessingUrl("/login").defaultSuccessUrl("/user/index").failureUrl("/loginerror").permitAll()
         .and().rememberMe()
         .and().logout().logoutSuccessUrl("/").permitAll();
     }
     @Override
     public void configure(WebSecurity web) throws Exception {
         //解决静态资源被拦截的问题
-        web.ignoring().antMatchers("/**.js","**.properties","/user/register");
+        web.ignoring().antMatchers("/js/**","/style/**");
     }
 }

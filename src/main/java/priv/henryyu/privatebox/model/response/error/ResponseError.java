@@ -7,7 +7,13 @@ package priv.henryyu.privatebox.model.response.error;
  * @version 1.0.0
  */
 public enum ResponseError {
-	Success,UserAlreadyExist,ErrorUserNameOrPassword,ErrorInvitationCode,UsedInvitationCode,Exception;
+	Success,
+	UserAlreadyExist,
+	ErrorUserNameOrPassword,
+	ErrorInvitationCode,
+	UsedInvitationCode,
+	IllegalInput,
+	Exception;
 }
  
 

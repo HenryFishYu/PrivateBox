@@ -20,6 +20,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * BaseUser class
@@ -36,9 +38,10 @@ public class User implements Serializable,UserDetails{
 	private Timestamp createTime;
 	@ManyToMany(cascade = {CascadeType.REFRESH},fetch = FetchType.EAGER)
     private List<Role> roles=new LinkedList<Role>();
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
+	@JsonIgnore
 	private InvitationCode usedInvitationCode;
-	@OneToMany(fetch=FetchType.EAGER)
+	@OneToMany(fetch=FetchType.LAZY)
 	private Set<InvitationCode> generatedInvoInvitationCodes=new HashSet<InvitationCode>();
 	
 	
@@ -48,10 +51,10 @@ public class User implements Serializable,UserDetails{
 
 
 
-	public void setUsedInvitationCode(InvitationCode usedInvitationCode) {
+	public void usedInvitationCode(InvitationCode usedInvitationCode) {
 		this.usedInvitationCode = usedInvitationCode;
-		usedInvitationCode.setUseTime(new Timestamp(System.currentTimeMillis()));
-		usedInvitationCode.setUseUser(this);
+		usedInvitationCode.setUsedTime(new Timestamp(System.currentTimeMillis()));
+		usedInvitationCode.setUsedUser(this);
 		usedInvitationCode.setUsed(true);
 	}
 

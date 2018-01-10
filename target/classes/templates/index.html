@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <#import "spring.ftl" as spring/>
+<#include "common.ftl">  
+<@header title="PrivateBox">  
+</@header>
 <html>
 <head>
     <meta charset="UTF-8"></meta>
-    <title>PrivateBox</title>
-    <script src="jquery-3.2.1.js"></script>
     <script>
      $(document).ready(function(){
     	 var headers = {};
 	    	headers['X-CSRF-TOKEN'] = "${_csrf.token}";
+	    	$(document).keydown(function(event){
+	    	　　　　if(event.keyCode==13){
+	    			$("#login-button").click();
+	    	　　　　}
+	    	　　});
 	    $("#register-button").click(function(){
 
 	    	$.ajax({
@@ -22,13 +28,19 @@
 	    	    headers: headers,
 	    	    dataType: "json",
 	    	    success: function(result) {
-	    	    	alert(result.message);
+	    	    	if(result.error=="Success"){
+	    	    		cleanRegisterForm();
+	    	    	}
+	    	    	$.messager.alert('提示', result.message, 'info');
 	    	    },
 	    	    error:function(result){
-	    	    	alert(result.message);
+	    	    	$.messager.alert('提示', result.message, 'info');
 	    	    }
 	    	});
 	    });
+	    function cleanRegisterForm(){
+	    	$(".register").val('');
+	    }
      });
     </script>
     <style type="text/css">
@@ -36,9 +48,9 @@
 </head>
 <body>
 <div id="login-div">
-<form id="login-form" method="post" action="/">
-<input type="text" name="username" id="login-name" />
-<input type="password" name="password" id="login-password" />
+<form id="login-form" method="post" action="/login">
+<@spring.message 'username' />:<input type="text" name="username" id="login-name" /><br />
+<@spring.message 'password' />:<input type="password" name="password" id="login-password" /><br />
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 <input type="submit" id="login-button" value="<@spring.message 'login' />" /> 
 </form>
@@ -48,9 +60,9 @@
 <#else>
 </#if>
 <div id="register-div">
-<input type="text" id="register-name" />
-<input type="password" id="register-password" />
-<input type="text" id="register-invitation-code" />
+<@spring.message 'username' />:<input type="text" class="register" id="register-name" /><br />
+<@spring.message 'password' />:<input type="password" class="register" id="register-password" /><br />
+<@spring.message 'invitationCode' />:<input type="text" class="register" id="register-invitation-code" /><br />
 <input type="button" id="register-button" value="<@spring.message 'register' />"/> 
 </div>
 <a href="/?language=en_US">English(US)</a>
