@@ -16,8 +16,8 @@ import org.aspectj.lang.reflect.MethodSignature;
  * @date 2017年12月21日上午11:46:35
  * @version 1.0.0
  */
-@Aspect
-@Component
+/*@Aspect
+@Component*/
 public class UserAspect {
 	/*@Pointcut("execution(* priv.henryyu.privatebox.controller..*(..)) and @annotation(org.springframework.web.bind.annotation.RequestMapping)")  
     public void controllerMethodPointcut(){}  

@@ -16,6 +16,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class User implements Serializable,UserDetails{
 	@Id
 	private String username;
+	@JsonIgnore
 	private String password;
 	private Timestamp createTime;
 	@ManyToMany(cascade = {CascadeType.REFRESH},fetch = FetchType.EAGER)
@@ -43,12 +46,14 @@ public class User implements Serializable,UserDetails{
 	private InvitationCode usedInvitationCode;
 	@OneToMany(fetch=FetchType.LAZY)
 	private Set<InvitationCode> generatedInvoInvitationCodes=new HashSet<InvitationCode>();
-	
+	@OneToMany(fetch=FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
+	@JsonIgnore
+	private Set<LoginDetails> loginDetailsSet=new HashSet<LoginDetails>();
 	
 	public InvitationCode getUsedInvitationCode() {
 		return usedInvitationCode;		
 	}
-
 
 
 	public void usedInvitationCode(InvitationCode usedInvitationCode) {
@@ -64,6 +69,17 @@ public class User implements Serializable,UserDetails{
 		return generatedInvoInvitationCodes;
 	}
 
+
+	
+	public Set<LoginDetails> getLoginDetailsSet() {
+		return loginDetailsSet;
+	}
+
+
+	public void addLoginDetails(LoginDetails loginDetails) {
+		loginDetails.setUser(this);
+		this.loginDetailsSet.add(loginDetails);
+	}
 
 
 	public void addGeneratedInvoInvitationCode(InvitationCode generatedInvitationCode) {

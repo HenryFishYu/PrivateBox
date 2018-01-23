@@ -53,4 +53,10 @@ public class UserController extends BaseComponent{
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;
 	}
+	
+	@RequestMapping("/showUploadFile")
+	public ModelAndView showUploadFile() {
+		ModelAndView modelAndView=new ModelAndView("user/uploadFile");
+		return modelAndView;
+	}
 }

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<#import "spring.ftl" as spring/>
 <#include "common.ftl">  
 <@header title="PrivateBox">  
 </@header>
@@ -7,14 +6,38 @@
 <head>
     <meta charset="UTF-8"></meta>
     <script>
+    $(document).keypress(function(event){  
+    	      if(event.key=="Enter"){
+    	    	  $("#login-button").click();
+    	      }
+    	    });
      $(document).ready(function(){
-    	 var headers = {};
-	    	headers['X-CSRF-TOKEN'] = "${_csrf.token}";
-	    	$(document).keydown(function(event){
-	    	　　　　if(event.keyCode==13){
-	    			$("#login-button").click();
-	    	　　　　}
-	    	　　});
+    	 $.ajaxSetup({
+ 	    	data:{ "${_csrf.parameterName}" : "${_csrf.token}" }
+ 	    });
+	    $("#login-button").click(function(){
+	    	$.ajax({
+	    	    url: "/login",
+	    	    data:{
+	    	    	username:$("#login-name").val(),
+	    	    	password:$("#login-password").val(),
+	    	    },
+	    	    type: "POST",
+	    	    dataType: "json",
+	    	    success: function(result) {
+	    	    	console.log(result);
+	    	    	if(result.status=="success"){
+	    	    		window.location.href="user/index";
+	    	    	}
+	    	    	if(result.status=="error"){
+	    	    		$.messager.alert('<@spring.message 'message' />', "error", 'info');
+	    	    	}
+	    	    },
+	    	    error:function(result){
+	    	    	$.messager.alert('<@spring.message 'message' />', "Please refresh the web and try again", 'info');
+	    	    }
+	    	});
+	    });
 	    $("#register-button").click(function(){
 
 	    	$.ajax({
@@ -25,16 +48,15 @@
 	    	    	invitationCode:$("#register-invitation-code").val()
 	    	    },
 	    	    type: "POST",
-	    	    headers: headers,
 	    	    dataType: "json",
 	    	    success: function(result) {
 	    	    	if(result.error=="Success"){
 	    	    		cleanRegisterForm();
 	    	    	}
-	    	    	$.messager.alert('提示', result.message, 'info');
+	    	    	$.messager.alert('<@spring.message 'message' />', result.message, 'info');
 	    	    },
 	    	    error:function(result){
-	    	    	$.messager.alert('提示', result.message, 'info');
+	    	    	$.messager.alert('<@spring.message 'message' />', result.message, 'info');
 	    	    }
 	    	});
 	    });
@@ -52,7 +74,7 @@
 <@spring.message 'username' />:<input type="text" name="username" id="login-name" /><br />
 <@spring.message 'password' />:<input type="password" name="password" id="login-password" /><br />
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-<input type="submit" id="login-button" value="<@spring.message 'login' />" /> 
+<input type="button" id="login-button" value="<@spring.message 'login' />" /> 
 </form>
 </div>
 <#if loginError??>

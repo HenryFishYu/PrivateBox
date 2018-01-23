@@ -2,6 +2,11 @@ server:
   port: 9090
 
 spring:
+  http:  
+    multipart:  
+      max-file-size: 10240MB  
+      max-request-size: 10240MB   
+      enabled: true  
   message:
     encoding:UTF-8
   freemarker:
@@ -15,7 +20,7 @@ spring:
   datasource:
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/privatebox
+      url: jdbc:mysql://localhost:3306/privatebox?useSSL=false
       username: root
       password: hyiechyiec
   jpa:

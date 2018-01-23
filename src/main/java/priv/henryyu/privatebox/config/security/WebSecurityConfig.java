@@ -1,5 +1,12 @@
 package priv.henryyu.privatebox.config.security;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -7,8 +14,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import priv.henryyu.privatebox.config.security.loginHandler.OnAuthenticationFailureHandler;
+import priv.henryyu.privatebox.config.security.loginHandler.OnAuthenticationSuccessHandler;
 import priv.henryyu.privatebox.service.UserService;
 /**
  * WebSecurityConfig class
@@ -39,7 +52,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     	.antMatchers("/admin/**").hasAnyRole("ADMIN")
     	//hasAnyRole("ADMIN") is the same as has hasAnyAuthority("ROLE_ADMIN")
     	.anyRequest().authenticated()
-        .and().formLogin().loginPage("/").loginProcessingUrl("/login").defaultSuccessUrl("/user/index").failureUrl("/loginerror").permitAll()
+        .and().formLogin().loginPage("/").loginProcessingUrl("/login")
+        .successHandler(new OnAuthenticationSuccessHandler())
+        .failureHandler(new OnAuthenticationFailureHandler())
+        .permitAll()
         .and().rememberMe()
         .and().logout().logoutSuccessUrl("/").permitAll();
     }

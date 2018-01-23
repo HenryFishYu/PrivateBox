@@ -1,5 +1,7 @@
 package priv.henryyu.privatebox.base;
 
+import java.io.File;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,13 @@ public class Startup implements CommandLineRunner{
 		// TODO Auto-generated method stub
 		userService.addRoles(roleRepository);
 		System.out.println("Is first time run this application:"+userService.isFirstTime());
+		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()+"files";
+		File folder=new File(path);
+		if(!folder.exists()) {
+			folder.mkdir();
+			System.out.println("Generate File Folder");
+		}
+		System.out.println("PrivateBox Run");
 	}
 
 }

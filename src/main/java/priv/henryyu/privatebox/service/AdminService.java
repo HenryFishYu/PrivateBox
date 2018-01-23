@@ -83,7 +83,8 @@ public class AdminService extends BaseComponent{
 		//User user=userRepository.findByUsername(getUser().getUsername());
 		Pageable pageable;
 		if(invitationCodeQueryForm.getSort()==null||invitationCodeQueryForm.getOrder()==null) {
-			pageable=new PageRequest(invitationCodeQueryForm.getPage()-1, invitationCodeQueryForm.getRows());
+			Sort sort=new Sort(Direction.DESC,"createTime");
+			pageable=new PageRequest(invitationCodeQueryForm.getPage()-1, invitationCodeQueryForm.getRows(),sort);
 		}else {
 			Sort sort=new Sort(Direction.fromString(invitationCodeQueryForm.getOrder()),invitationCodeQueryForm.getSort());
 			pageable=new PageRequest(invitationCodeQueryForm.getPage()-1, invitationCodeQueryForm.getRows(),sort);

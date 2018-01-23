@@ -95,9 +95,11 @@
 				for(var i=0;i<rowData.usedUser.roles.length;i++){
 					roles+=rowData.usedUser.roles[i].name;
 				}
-				alert("Username:"+rowData.usedUser.username+"\n"
-						+"Roles:"+roles+"\n"
-						+"CreateTime:"+$.timeStamp2String(rowData.usedUser.createTime));
+				
+				var userDetails="Username:"+rowData.usedUser.username+"<br />"
+						+"Roles:"+roles+"<br />"
+						+"CreateTime:"+$.timeStamp2String(rowData.usedUser.createTime);
+				$.messager.alert('UserDetails', userDetails);
 			}
 		});
 	});

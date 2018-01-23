@@ -1,20 +1,30 @@
-<!DOCTYPE html>
+<#include "../common.ftl">  
+<@header title="User">  
+</@header>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$.ajaxSetup({
+	    	data:{ "${_csrf.parameterName}" : "${_csrf.token}" }
+	    });
 
-<#include "../common.ftl">
-
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+		$('#upload-files-div').window({
+		    width:600,
+		    height:400,
+		    href:'showUploadFile',
+		    closed:true
+		});
+		$("#open-upload-file-div").click(function(){
+			$('#upload-files-div').dialog("closed",false);
+		})
+	});
+	
+</script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
-   <a href="../admin/index"><input type="button" value="Admin" /></a>
+   <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'">admin</a><br />
 </@authorize>
-User Index
+<div id="upload-files-div"></div>
+<a id="open-upload-file-div" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
 <form action="../logout" method="post">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 	<input type="submit" value="<@spring.message 'logout' />">
 </form>
-</body>
-</html>

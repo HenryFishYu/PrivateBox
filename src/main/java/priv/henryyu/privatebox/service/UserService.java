@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 
 import priv.henryyu.privatebox.base.BaseComponent;
 import priv.henryyu.privatebox.entity.InvitationCode;
+import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.entity.Role;
 import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.RegisterUser;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.model.response.error.ResponseError;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
+import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
 import static org.springframework.beans.BeanUtils.copyProperties;
@@ -43,6 +45,8 @@ public class UserService extends BaseComponent implements UserDetailsService{
 	@Autowired
     RoleRepository roleRepository;
 	@Autowired
+	LoginDetailsRepository loginDetailsRepository;
+	@Autowired
     InvitationCodeRepository invitationCodeRepository;
 	/**
 	* Spring-boot-security
@@ -60,6 +64,10 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		if (user == null) {
             throw new UsernameNotFoundException("User not exist");
         }
+		LoginDetails loginDetails=new LoginDetails(request);
+		user.addLoginDetails(loginDetails);
+		loginDetailsRepository.save(loginDetails);
+		userRepository.save(user);
         System.out.println("username:"+user.getUsername()+";password:"+user.getPassword());
         return user;
 	}
