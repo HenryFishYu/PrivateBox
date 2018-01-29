@@ -1,5 +1,42 @@
 <#include "../common.ftl">
 <script>
+function startUpload(){
+	uploader.upload();
+}
+WebUploader.Uploader.register({
+    'before-send-file': 'preupload'
+}, {
+    preupload: function( file ) {
+        var me = this,
+            owner = this.owner,
+            server = me.options.server,
+            deferred = WebUploader.Deferred();
+        $.ajax({
+    	    url: "../file/preUpload",
+    	    data:{
+    	    	pieceSHA512:file.pieceSHA512,
+    	    	originalFilename:file.name
+    	    },
+    	    type: "POST",
+    	    dataType: "json",
+    	    success: function(responseMessage) {
+    	    	if(responseMessage.code=="FileExist"){
+    	    		owner.skipFile(file);
+    	    		uploadGrid.datagrid('updateRow',
+    	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{progress:100}});
+    	    		deferred.reject();
+    	    	}
+    	    	console.log(responseMessage);
+    	    	deferred.resolve();
+    	    },
+    	    error:function(){
+    	    	$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
+    	    	deferred.reject();
+    	    }
+    	});
+        return $.when(deferred);
+    }
+});
 $(document).ready(function(){
 	var totalFilesNumber=0;
 	var readyFilesNumber=0;
@@ -25,7 +62,7 @@ $(document).ready(function(){
             var pieceArrayBuffer=this.result.slice(0,1000000);
         	var pieceWordArray=CryptoJS.lib.WordArray.create(pieceArrayBuffer);
         	var pieceSHA512=CryptoJS.SHA512(pieceWordArray).toString();
-        	file.pieceSHA512=pieceSHA512;
+        	file.pieceSHA512=pieceSHA512;     	
             console.log(pieceSHA512);
         }
     });
@@ -103,25 +140,7 @@ var uploader = WebUploader.create({
     	${_csrf.parameterName}:'${_csrf.token}'
     }
 });
-function startUpload(){
-	uploader.upload();
-}
-WebUploader.Uploader.register({
-    'before-send-file': 'preupload'
-}, {
-    preupload: function( file ) {
-        var me = this,
-            owner = this.owner,
-            server = me.options.server,
-            deferred = WebUploader.Deferred();
-				if(file.pieceSHA512==undefined)	{
-					setTimeout(deferred.reject,100);
-				}else{
-                	deferred.resolve();
-				}
-        return $.when(deferred);
-    }
-});
+
 </script>
 <div id="hidden-picker-div" style="display:none">
 </div>

@@ -13,7 +13,6 @@ import javax.persistence.Id;
  * @date 2018年1月10日下午3:49:57
  * @version 1.0.0
  */
-import javax.persistence.ManyToOne;
 @Entity
 public class File implements Serializable{
 
@@ -21,28 +20,22 @@ public class File implements Serializable{
 	private String id;
 	private Timestamp createTime;
 	private String originalName;
-	private String fileType;
-	private Boolean deleted;
-	@ManyToOne
-	private User user;
-	@ManyToOne
-	private UniqueFile uniqueFile;
+	private String extension;
+	private boolean deleted;
+	private String username;
+	private String encryptName;
 	
 	public File() {
 		id=UUID.randomUUID().toString();
 		createTime=new Timestamp(System.currentTimeMillis());
 	}
 
-	
-	public Boolean getDeleted() {
+	public boolean isDeleted() {
 		return deleted;
 	}
-
-	public void setDeleted(Boolean deleted) {
+	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
-
-
 	public String getOriginalName() {
 		return originalName;
 	}
@@ -51,29 +44,36 @@ public class File implements Serializable{
 		this.originalName = originalName;
 	}
 
-	public String getFileType() {
-		return fileType;
+	
+	
+
+	public String getExtension() {
+		return extension;
 	}
 
-	public void setFileType(String fileType) {
-		this.fileType = fileType;
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 
-	public User getUser() {
-		return user;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public UniqueFile getUniqueFile() {
-		return uniqueFile;
+
+	public String getEncryptName() {
+		return encryptName;
 	}
 
-	public void setUniqueFile(UniqueFile uniqueFile) {
-		this.uniqueFile = uniqueFile;
+
+	public void setEncryptName(String encryptName) {
+		this.encryptName = encryptName;
 	}
+
 
 	public String getId() {
 		return id;

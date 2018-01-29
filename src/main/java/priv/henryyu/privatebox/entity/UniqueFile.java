@@ -26,9 +26,6 @@ public class UniqueFile implements Serializable{
 	private String encryptName;
 	private String path;
 	private Timestamp createTime;
-	@OneToMany
-	@Fetch(FetchMode.JOIN)
-	private Set<File> files=new HashSet<File>();
 	
 	public UniqueFile() {
 		createTime=new Timestamp(System.currentTimeMillis());
@@ -48,14 +45,6 @@ public class UniqueFile implements Serializable{
 
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	public Set<File> getFiles() {
-		return files;
-	}
-
-	public void setFiles(Set<File> files) {
-		this.files = files;
 	}
 
 	public Timestamp getCreateTime() {

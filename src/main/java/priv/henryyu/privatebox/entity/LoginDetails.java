@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -42,11 +42,56 @@ public class LoginDetails implements Serializable{
 	private String language;
 	private String defaultLanguage;
 	private Timestamp createTime;
-	@ManyToOne
-	private User user;
+	private String username;
+	private String className;
+	private String param;
+	private String methodName;
+	@Column(length=2048)
+	private String returnResult;
+	private String returnResultClass;
 	
 	
 	
+	public String getReturnResultClass() {
+		return returnResultClass;
+	}
+
+	public void setReturnResultClass(String returnResultClass) {
+		this.returnResultClass = returnResultClass;
+	}
+
+	public String getReturnResult() {
+		return returnResult;
+	}
+
+	public void setReturnResult(String returnResult) {
+		this.returnResult = returnResult;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
+	public String getParam() {
+		return param;
+	}
+
+	public void setParam(String param) {
+		this.param = param;
+	}
+
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
 	public LoginDetails() {
 	}
 
@@ -151,12 +196,15 @@ public class LoginDetails implements Serializable{
 	public void setUserAgentString(String userAgentString) {
 		this.userAgentString = userAgentString;
 	}
-	public User getUser() {
-		return user;
+	
+	public String getUsername() {
+		return username;
 	}
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
+
 	public Timestamp getCreateTime() {
 		return createTime;
 	}

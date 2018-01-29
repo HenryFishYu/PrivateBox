@@ -1,17 +1,18 @@
 package priv.henryyu.privatebox.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import priv.henryyu.privatebox.base.BaseComponent;
 import priv.henryyu.privatebox.entity.User;
@@ -28,7 +29,7 @@ import priv.henryyu.privatebox.service.UserService;
 @Controller
 @RequestMapping("/user")
 public class UserController extends BaseComponent{
-	
+	private static final Log log = LogFactory.getLog(UserController.class);
 	@Autowired
 	UserService userService;
 	/**
@@ -38,18 +39,21 @@ public class UserController extends BaseComponent{
 	* RegisterUser
 	* @return 结果
 	* ResponseMessage
+	 * @throws JsonProcessingException 
 	* @throws Exception
 	*/
 	@RequestMapping("/register")
 	@ResponseBody
-	public ResponseMessage<User> register(RegisterUser registerUser) {
+	public ResponseMessage<User> register(RegisterUser registerUser) throws JsonProcessingException {	
+		log.info("user register param:"+mapper.writeValueAsString(registerUser));
 		ResponseMessage<User> responseMessage=userService.registerUser(registerUser);
-		return responseMessage;
+		log.info("user register return:"+mapper.writeValueAsString(responseMessage));
+		return responseMessage;	
 	}
 	
 	@RequestMapping("/index")
 	public ModelAndView index() {
-		getSession().removeAttribute("loginError");
+		log.info(getUser().getUsername()+"--login");
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;
 	}

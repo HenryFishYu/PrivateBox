@@ -1,6 +1,6 @@
 package priv.henryyu.privatebox.model.response;
 
-import priv.henryyu.privatebox.model.response.error.ResponseError;
+import priv.henryyu.privatebox.model.response.error.ResponseCode;
 
 /**
  * XXX class
@@ -10,15 +10,16 @@ import priv.henryyu.privatebox.model.response.error.ResponseError;
  * @version 1.0.0
  */
 public class ResponseMessage<T> {
-	private ResponseError error;
+	private ResponseCode code;
 	private String message;
 	private T data;
 	
-	public ResponseError getError() {
-		return error;
+	
+	public ResponseCode getCode() {
+		return code;
 	}
-	public void setError(ResponseError error) {
-		this.error = error;
+	public void setCode(ResponseCode code) {
+		this.code = code;
 	}
 	public String getMessage() {
 		return message;

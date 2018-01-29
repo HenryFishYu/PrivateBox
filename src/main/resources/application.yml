@@ -1,7 +1,18 @@
 server:
   port: 9090
-
+logging:
+  path:
+    log
 spring:
+  activemq:
+    packages:
+      trust-all:
+        true
+    in-memory:
+      true
+    pool:
+      enabled:
+        false
   http:  
     multipart:  
       max-file-size: 10240MB  
@@ -30,4 +41,4 @@ spring:
     hibernate:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL5Dialect
-    show-sql: true
+    show-sql: false

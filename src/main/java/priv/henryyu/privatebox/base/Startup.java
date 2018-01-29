@@ -27,7 +27,6 @@ public class Startup implements CommandLineRunner{
 	@Override
 	public void run(String... arg0) throws Exception {
 		// TODO Auto-generated method stub
-		userService.addRoles(roleRepository);
 		System.out.println("Is first time run this application:"+userService.isFirstTime());
 		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()+"files";
 		File folder=new File(path);

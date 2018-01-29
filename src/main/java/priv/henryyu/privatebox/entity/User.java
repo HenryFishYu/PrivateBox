@@ -38,63 +38,20 @@ public class User implements Serializable,UserDetails{
 	private String username;
 	@JsonIgnore
 	private String password;
+	private boolean accountNonExpired;
+	private boolean accountNonLocked;
+	private boolean credentialsNonExpired;
+	private boolean enabled;
 	private Timestamp createTime;
 	@ManyToMany(cascade = {CascadeType.REFRESH},fetch = FetchType.EAGER)
     private List<Role> roles=new LinkedList<Role>();
-	@OneToOne(fetch=FetchType.LAZY)
-	@JsonIgnore
-	private InvitationCode usedInvitationCode;
-	@OneToMany(fetch=FetchType.LAZY)
-	private Set<InvitationCode> generatedInvoInvitationCodes=new HashSet<InvitationCode>();
-	@OneToMany(fetch=FetchType.LAZY)
-	@Fetch(FetchMode.JOIN)
-	@JsonIgnore
-	private Set<LoginDetails> loginDetailsSet=new HashSet<LoginDetails>();
-	
-	public InvitationCode getUsedInvitationCode() {
-		return usedInvitationCode;		
-	}
-
-
-	public void usedInvitationCode(InvitationCode usedInvitationCode) {
-		this.usedInvitationCode = usedInvitationCode;
-		usedInvitationCode.setUsedTime(new Timestamp(System.currentTimeMillis()));
-		usedInvitationCode.setUsedUser(this);
-		usedInvitationCode.setUsed(true);
-	}
-
-
-
-	public Set<InvitationCode> getGeneratedInvoInvitationCodes() {
-		return generatedInvoInvitationCodes;
-	}
-
-
-	
-	public Set<LoginDetails> getLoginDetailsSet() {
-		return loginDetailsSet;
-	}
-
-
-	public void addLoginDetails(LoginDetails loginDetails) {
-		loginDetails.setUser(this);
-		this.loginDetailsSet.add(loginDetails);
-	}
-
-
-	public void addGeneratedInvoInvitationCode(InvitationCode generatedInvitationCode) {
-		generatedInvitationCode.setCreateUser(this);
-		this.generatedInvoInvitationCodes.add(generatedInvitationCode);
-	}
-
-	public void addGeneratedInvoInvitationCodes(Set<InvitationCode> generatedInvitationCodes) {
-		for(InvitationCode invitationCode:generatedInvitationCodes) {
-			addGeneratedInvoInvitationCode(invitationCode);
-		}
-	}
 
 	public User() {
 		this.createTime=new Timestamp(System.currentTimeMillis());
+		accountNonExpired=true;
+		accountNonLocked=true;
+		credentialsNonExpired=true;
+		enabled=true;
 	}
 
 	public List<Role> getRoles() {
@@ -140,24 +97,38 @@ public class User implements Serializable,UserDetails{
 	}
 
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return true;
+		return accountNonExpired;
+	}
+
+	public void setAccountNonExpired(boolean accountNonExpired) {
+		this.accountNonExpired = accountNonExpired;
 	}
 
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return true;
+		return accountNonLocked;
+	}
+
+	public void setAccountNonLocked(boolean accountNonLocked) {
+		this.accountNonLocked = accountNonLocked;
 	}
 
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return true;
+		return credentialsNonExpired;
+	}
+
+	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+		this.credentialsNonExpired = credentialsNonExpired;
 	}
 
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return true;
+		return enabled;
 	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	
 	
 	
 	

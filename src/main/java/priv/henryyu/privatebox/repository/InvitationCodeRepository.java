@@ -15,7 +15,7 @@ import priv.henryyu.privatebox.entity.User;
  * @version 1.0.0
  */
 public interface InvitationCodeRepository extends PagingAndSortingRepository<InvitationCode,String>{
-	public Page<InvitationCode> findByCreateUserAndCodeLike(User user,String code,Pageable pageable);
+	public Page<InvitationCode> findByCreateUsernameAndCodeLike(String username,String code,Pageable pageable);
 }
  
 

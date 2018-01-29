@@ -20,7 +20,7 @@
 	    	    url: "/login",
 	    	    data:{
 	    	    	username:$("#login-name").val(),
-	    	    	password:$("#login-password").val(),
+	    	    	password:CryptoJS.SHA512($("#login-password").val()).toString(),
 	    	    },
 	    	    type: "POST",
 	    	    dataType: "json",
@@ -33,7 +33,7 @@
 	    	    		$.messager.alert('<@spring.message 'message' />', "error", 'info');
 	    	    	}
 	    	    },
-	    	    error:function(result){
+	    	    error:function(){
 	    	    	$.messager.alert('<@spring.message 'message' />', "Please refresh the web and try again", 'info');
 	    	    }
 	    	});
@@ -44,7 +44,7 @@
 	    	    url: "/user/register",
 	    	    data:{
 	    	    	username:$("#register-name").val(),
-	    	    	sha512Password:$("#register-password").val(),
+	    	    	sha512Password:CryptoJS.SHA512($("#register-password").val()).toString(),
 	    	    	invitationCode:$("#register-invitation-code").val()
 	    	    },
 	    	    type: "POST",

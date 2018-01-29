@@ -15,7 +15,7 @@
     	    type: "POST",
     	    dataType: "json",
     	    success: function(responseMessage) {
-    	    	if(responseMessage.error!="Success"){
+    	    	if(responseMessage.code!="Success"){
     	    		$.messager.alert('提示', responseMessage.message, 'info');
     	    		return;
     	    	}
@@ -65,15 +65,9 @@
 
 			} ] ],
 			columns : [ [ {
-				field : 'usedUser',
-				title : 'usedUser',
+				field : 'usedUsername',
+				title : 'usedUsername',
 				width : 150,
-				formatter : function(value, row, index) {
-					//console.log(row);
-					if(value!=null){
-					return "\<a\ href='#'>"+value.username+"\</a\>";
-					}
-				}
 			},{
 				field : 'used',
 				title : 'used',
@@ -91,14 +85,14 @@
 				e.preventDefault();
 				$(this).datagrid('unselectAll').datagrid('uncheckAll');
 				$(this).datagrid('selectRow', rowIndex);
-				var roles="";
+				/* var roles="";
 				for(var i=0;i<rowData.usedUser.roles.length;i++){
 					roles+=rowData.usedUser.roles[i].name;
 				}
 				
 				var userDetails="Username:"+rowData.usedUser.username+"<br />"
 						+"Roles:"+roles+"<br />"
-						+"CreateTime:"+$.timeStamp2String(rowData.usedUser.createTime);
+						+"CreateTime:"+$.timeStamp2String(rowData.usedUser.createTime); */
 				$.messager.alert('UserDetails', userDetails);
 			}
 		});

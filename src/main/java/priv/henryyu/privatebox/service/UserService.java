@@ -18,13 +18,16 @@ import priv.henryyu.privatebox.entity.Role;
 import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.RegisterUser;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
-import priv.henryyu.privatebox.model.response.error.ResponseError;
+import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
+import priv.henryyu.privatebox.tools.Encrypt;
+
 import static org.springframework.beans.BeanUtils.copyProperties;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,10 +67,6 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		if (user == null) {
             throw new UsernameNotFoundException("User not exist");
         }
-		LoginDetails loginDetails=new LoginDetails(request);
-		user.addLoginDetails(loginDetails);
-		loginDetailsRepository.save(loginDetails);
-		userRepository.save(user);
         System.out.println("username:"+user.getUsername()+";password:"+user.getPassword());
         return user;
 	}
@@ -87,27 +86,28 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		if(userRepository.findByUsername(registerUser.getUsername())!=null) {
 			String message = messageSource.getMessage("userAlreadyExist",null,locale);
 			jpaResponseMessage.setMessage(message);
-			jpaResponseMessage.setError(ResponseError.UserAlreadyExist);
+			jpaResponseMessage.setCode(ResponseCode.UserAlreadyExist);
 			return jpaResponseMessage;
 		}
 		InvitationCode invitationCode=invitationCodeRepository.findOne(registerUser.getInvitationCode());
 		if(invitationCode==null) {
 			String message = messageSource.getMessage("errorInvitationCode",null,locale);
 			jpaResponseMessage.setMessage(message);
-			jpaResponseMessage.setError(ResponseError.ErrorInvitationCode);
+			jpaResponseMessage.setCode(ResponseCode.ErrorInvitationCode);
 			return jpaResponseMessage;
 		}
 		if(invitationCode.isUsed()) {
 			String message = messageSource.getMessage("usedInvitationCode",null,locale);
 			jpaResponseMessage.setMessage(message);
-			jpaResponseMessage.setError(ResponseError.UsedInvitationCode);
+			jpaResponseMessage.setCode(ResponseCode.UsedInvitationCode);
 			return jpaResponseMessage;
 		}
 		User savedUser=userRepository.save(user);
+		invitationCode.setUsedUsername(savedUser.getUsername());
+		invitationCode.setUsed(true);
+		invitationCode.setUsedTime(new Timestamp(System.currentTimeMillis()));
 		invitationCodeRepository.save(invitationCode);
-		savedUser.usedInvitationCode(invitationCode);
-		savedUser=userRepository.save(savedUser);
-		jpaResponseMessage.setError(ResponseError.Success);
+		jpaResponseMessage.setCode(ResponseCode.Success);
 		String message = messageSource.getMessage("registerSuccess",null,locale);
 		jpaResponseMessage.setMessage(message+"------"+savedUser.getUsername());
 		//jpaResponseMessage.setData(savedUser);
@@ -148,12 +148,7 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		user.setPassword(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(registerUser.getSha512Password()));
 		Role role=new Role();
 		role.setName("ROLE_USER");
-		try{
-			user.addRole(role);
-		}catch (EntityNotFoundException e) {
-			addRoles(roleRepository);
-			user.addRole(role);
-		}
+		user.addRole(role);
 		return user;
 	}
 	
@@ -161,10 +156,12 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		if(userRepository.findByUsername("admin")!=null) {
 			return false;
 		}
+		addRoles(roleRepository);
 		User user=new User();
 		user.setUsername("admin");
-		user.setPassword("{bcrypt}$2a$10$fv7vd1rn8Xc1yqOMW2wIf.8Zcs1JkSxcRVH/uDZ3VNy2BbZN2n2Re");
-		List<Role> roles=new ArrayList<Role>();
+		String defaultPassword="admin";
+		String SHA512Password=Encrypt.EncodeString(defaultPassword, "SHA-512");
+		user.setPassword(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(SHA512Password));
 		Role userRole=new Role();
 		userRole.setName("ROLE_USER");
 		Role adminRole=new Role();

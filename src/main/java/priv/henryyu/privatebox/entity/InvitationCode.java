@@ -5,13 +5,8 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * InvitationCode class
  * 
@@ -23,14 +18,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class InvitationCode implements Serializable{
 	@Id
 	private String code;
-	private Boolean used;
+	private boolean used;
 	private Timestamp createTime;
 	private Timestamp usedTime;
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JsonIgnore
-	private User createUser;
-	@OneToOne(fetch=FetchType.EAGER)
-	private User usedUser;
+	private String createUsername;
+	private String usedUsername;
 	
 	public InvitationCode() {
 		this.createTime=new Timestamp(System.currentTimeMillis());
@@ -49,20 +41,9 @@ public class InvitationCode implements Serializable{
 	public void setUsed(boolean used) {
 		this.used = used;
 	}
-	public User getCreateUser() {
-		return createUser;
-	}
-	public void setCreateUser(User createUser) {
-		this.createUser = createUser;
-	}
+
 	public Timestamp getCreateTime() {
 		return createTime;
-	}
-	public Boolean getUsed() {
-		return used;
-	}
-	public void setUsed(Boolean used) {
-		this.used = used;
 	}
 	public Timestamp getUsedTime() {
 		return usedTime;
@@ -70,11 +51,18 @@ public class InvitationCode implements Serializable{
 	public void setUsedTime(Timestamp usedTime) {
 		this.usedTime = usedTime;
 	}
-	public User getUsedUser() {
-		return usedUser;
+	public String getCreateUsername() {
+		return createUsername;
 	}
-	public void setUsedUser(User usedUser) {
-		this.usedUser = usedUser;
+	public void setCreateUsername(String createUsername) {
+		this.createUsername = createUsername;
 	}
+	public String getUsedUsername() {
+		return usedUsername;
+	}
+	public void setUsedUsername(String usedUsername) {
+		this.usedUsername = usedUsername;
+	}
+	
 	
 }

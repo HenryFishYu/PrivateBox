@@ -9,6 +9,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import priv.henryyu.privatebox.entity.User;
 
 /**
@@ -27,7 +29,7 @@ public class BaseComponent {
 	protected HttpServletResponse response;
 	@Autowired
 	protected MessageSource messageSource;
-	
+	protected ObjectMapper mapper=new ObjectMapper();
 	public HttpSession getSession() {
 		return request.getSession();
 	}

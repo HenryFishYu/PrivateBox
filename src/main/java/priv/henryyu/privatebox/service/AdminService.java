@@ -1,5 +1,6 @@
 package priv.henryyu.privatebox.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,7 @@ import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.InvitationCodeQueryForm;
 import priv.henryyu.privatebox.model.response.DataGrid;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
-import priv.henryyu.privatebox.model.response.error.ResponseError;
+import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
 
@@ -43,43 +44,38 @@ import priv.henryyu.privatebox.repository.UserRepository;
 public class AdminService extends BaseComponent{
 	@Autowired
 	private InvitationCodeRepository invitationCodeRepository;
-	@Autowired
-	private UserRepository userRepository;
 	private static final String empty="";
 	
-	public ResponseMessage<Set<InvitationCode>> generateInvitationCodes(String amount) {
-		ResponseMessage<Set<InvitationCode>> responseMessage=new ResponseMessage<Set<InvitationCode>>();
-		Locale locale= RequestContextUtils.getLocale(request);
+	public ResponseMessage<List<InvitationCode>> generateInvitationCodes(String amount) {
+		ResponseMessage<List<InvitationCode>> responseMessage=new ResponseMessage<List<InvitationCode>>();
+		Locale locale=RequestContextUtils.getLocale(request);
+		/*Locale locale= RequestContextUtils.getLocale(request);*/
 		//String LoginError=messageSource.getMessage("loginError", null,locale);
 		if(empty.equals(amount)||!StringUtils.isNumber(amount)) {
-			responseMessage.setError(ResponseError.IllegalInput);
+			responseMessage.setCode(ResponseCode.IllegalInput);
 			responseMessage.setMessage(messageSource.getMessage("remind_InputNumber", null,locale));
 			return responseMessage;
 		}
 		int intAmount=Integer.valueOf(amount);
 		if(intAmount<=0||intAmount>10) {
-			responseMessage.setError(ResponseError.IllegalInput);
+			responseMessage.setCode(ResponseCode.IllegalInput);
 			responseMessage.setMessage(messageSource.getMessage("remind_OutOfLimit", null,locale));
 			return responseMessage;
 		}
-		User user=userRepository.findByUsername(getUser().getUsername());
-		Set<InvitationCode> invitationCodes=new HashSet<InvitationCode>();
+		List<InvitationCode> invitationCodes=new ArrayList<InvitationCode>();
 		for(int i=0;i<intAmount;i++) {
-			invitationCodes.add(new InvitationCode());
+			InvitationCode invitationCode=new InvitationCode();
+			invitationCode.setCreateUsername(getUser().getUsername());
+			invitationCodes.add(invitationCode);
 		}
-		user.addGeneratedInvoInvitationCodes(invitationCodes);
 		invitationCodeRepository.save(invitationCodes);
-		userRepository.save(user);
-		responseMessage.setError(ResponseError.Success);
-		for(InvitationCode invitationCode:invitationCodes) {
-			invitationCode.setCreateUser(null);
-		}
+		responseMessage.setCode(ResponseCode.Success);
 		responseMessage.setData(invitationCodes);
 		return responseMessage;
 	}
 	
-	public DataGrid queryInvitationCodes(InvitationCodeQueryForm invitationCodeQueryForm){
-		DataGrid dataGrid=new DataGrid();
+	public DataGrid<InvitationCode> queryInvitationCodes(InvitationCodeQueryForm invitationCodeQueryForm){
+		DataGrid<InvitationCode> dataGrid=new DataGrid<InvitationCode>();
 		//User user=userRepository.findByUsername(getUser().getUsername());
 		Pageable pageable;
 		if(invitationCodeQueryForm.getSort()==null||invitationCodeQueryForm.getOrder()==null) {
@@ -92,7 +88,7 @@ public class AdminService extends BaseComponent{
 		if(invitationCodeQueryForm.getCode()==null) {
 			invitationCodeQueryForm.setCode("");
 		}
-		Page<InvitationCode> page=invitationCodeRepository.findByCreateUserAndCodeLike(getUser(),"%"+invitationCodeQueryForm.getCode()+"%",pageable);
+		Page<InvitationCode> page=invitationCodeRepository.findByCreateUsernameAndCodeLike(getUser().getUsername(),"%"+invitationCodeQueryForm.getCode()+"%",pageable);
 		dataGrid.setTotal((int)page.getTotalElements());
 		dataGrid.setRows(page.getContent());
 		return dataGrid;
