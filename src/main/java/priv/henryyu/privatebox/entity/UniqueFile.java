@@ -26,7 +26,17 @@ public class UniqueFile implements Serializable{
 	private String encryptName;
 	private String path;
 	private Timestamp createTime;
+	private Long size;
 	
+	
+	public Long getSize() {
+		return size;
+	}
+
+	public void setSize(Long size) {
+		this.size = size;
+	}
+
 	public UniqueFile() {
 		createTime=new Timestamp(System.currentTimeMillis());
 	}

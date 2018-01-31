@@ -1,5 +1,26 @@
 <#include "../common.ftl">
 <script>
+var totalFilesNumber=0;
+var readyFilesNumber=0;
+var finishedFilesNumber=0;
+
+function addTotalFilesFun(){
+	totalFilesNumber++;
+	//console.log(totalFilesNumber);
+	$('#upload-files').linkbutton('disable');
+}
+function addReadyFilesFun(){
+	readyFilesNumber++;
+	if(readyFilesNumber==totalFilesNumber){
+		$('#upload-files').linkbutton('enable');
+	}
+}
+function addFinishedFilesFun(){
+	finishedFilesNumber++;
+	if(finishedFilesNumber==totalFilesNumber){
+		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
+	}
+}
 function startUpload(){
 	uploader.upload();
 }
@@ -21,6 +42,7 @@ WebUploader.Uploader.register({
     	    dataType: "json",
     	    success: function(responseMessage) {
     	    	if(responseMessage.code=="FileExist"){
+    	    		addFinishedFilesFun();
     	    		owner.skipFile(file);
     	    		uploadGrid.datagrid('updateRow',
     	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{progress:100}});
@@ -38,8 +60,6 @@ WebUploader.Uploader.register({
     }
 });
 $(document).ready(function(){
-	var totalFilesNumber=0;
-	var readyFilesNumber=0;
 
 	uploader.on( 'fileQueued', function( file ) {
 		addTotalFilesFun();
@@ -70,6 +90,16 @@ $(document).ready(function(){
         uploadGrid.datagrid('updateRow',
                 {index:uploadGrid.datagrid('getRowIndex',file.id),row:{progress:(percentage * 100).toFixed(2)}});
     });
+	uploader.on('uploadSuccess',function(file,responseMessage){
+		if(responseMessage=="Error"){
+			$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
+			return;
+		}
+		addFinishedFilesFun();
+	});
+	/* uploader.on('uploadError',function(file){
+			$.messager.alert('<@spring.message 'message' />', '222<@spring.message 'error' />', 'info');
+	}); */
     uploadGrid = $("#upload-files-grid").datagrid({
         fit: true,
         fitColumns: true,
@@ -119,17 +149,7 @@ $(document).ready(function(){
     	uploader.upload();
     }); */
 
-    function addTotalFilesFun(){
-    	totalFilesNumber++;
-    	//console.log(totalFilesNumber);
-    	$('#upload-files').linkbutton('disable');
-    }
-    function addReadyFilesFun(){
-    	readyFilesNumber++;
-    	if(readyFilesNumber==totalFilesNumber){
-    		$('#upload-files').linkbutton('enable');
-    	}
-    }
+
 });
 var uploader = WebUploader.create({
     server: '${ctx}/file/upload',

@@ -8,7 +8,8 @@
 	    });
 
 		$('#upload-files-div').window({
-		    width:600,
+			title:'upload',
+		    width:800,
 		    height:400,
 		    href:'showUploadFile',
 		    closed:true
@@ -16,7 +17,84 @@
 		$("#open-upload-file-div").click(function(){
 			$('#upload-files-div').window("open");
 		})
+		dataGrid = $("#download-files-grid").datagrid({
+			url : '${ctx}/user/queryFiles',
+			queryParams:$('#searchForm').serializeObject(),
+	        fit: true,
+	        resizable:true,
+	        fitColumns: true,
+	        rownumbers: true,
+	        nowrap: true,
+	        animate: false,
+	        border: false,
+	        fitColumns:true,
+	        singleSelect: false,
+	        idField: 'fileId',
+	        pagination: true,
+	        columns:[[
+	            { field:'',checkbox:true },
+	            {title : 'encryptName',field:'encryptName',hidden:true,width:100},
+	            { title: 'id', field: 'id',hidden:true,width:100},
+	            { title: '文件名称',field: 'originalName',width: 230,sortable:true,fixed:true},
+	            { title: '文件后缀',field: 'extension',width: 80,sortable:true,fixed:true},  
+	            { title: '文件大小',field: 'size',width: 100,fixed:true,sortable:true,
+	            	formatter : function(value,row,index){
+					if(value>0){
+						return $.formatSize(value);
+						}
+					}},
+	            { title: '创建时间',field: 'createTime',width: 150,fixed:true,sortable:true,
+	            	formatter : function(value,row,index){
+					if(value>0){
+						return $.timeStamp2String(value);
+						}
+					}}
+	        ]]
+	    });
 	});
+	function searchFun() {
+		dataGrid.datagrid('load', $('#searchForm').serializeObject());
+	}
+	function deleteFun(){
+		var idArray=new Array();
+		var fileArray=dataGrid.datagrid('getSelections');
+		for(var i=0;i<fileArray.length;i++){
+			idArray.push(fileArray[i].id);
+		}
+		$.ajax({
+    	    url: "${ctx}/file/delete",
+    	    data:{
+    	    	ids:idArray
+    	    },
+    	    type: "POST",
+    	    dataType: "json",
+    	    success: function(responseMessage) {
+    	    	if(responseMessage.code=="Success"){
+    	    		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
+    	    		dataGrid.datagrid('clearSelections');
+    	    		return;
+    	    	}
+    	    	$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
+    	    },
+    	    error:function(){
+    	    	$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
+    	    }
+    	});
+	}
+	function downloadFun(){
+		var fileArray=dataGrid.datagrid('getSelections');
+		var url="${ctx}/file/download";
+        for(var i=0;i<fileArray.length;i++){
+        	console.log(i);
+        	var form = $("<form></form>").attr("action", url).attr("method", "post").attr("target","_blank");
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "encryptName").attr("value", fileArray[i].encryptName));
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "originalName").attr("value", fileArray[i].originalName));
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "extension").attr("value", fileArray[i].extension));
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "${_csrf.parameterName}").attr("value", "${_csrf.token}"))
+            form.appendTo('body').submit().remove();
+        	console.log(form);
+        }  
+	}
 	
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
@@ -28,3 +106,32 @@
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 	<input type="submit" value="<@spring.message 'logout' />">
 </form>
+	<div class="easyui-layout" data-options="fit : true,border : false">
+		<div data-options="region:'north',border:false" style="height: 40px; overflow: hidden;">
+			<form id="searchForm">
+				<table style="">
+					<tr>
+						<td style="text-align:right;">originalName:</td>
+						<td width="140px"><input name="originalName" type="text"  style="width:135px" autocomplete="off"/></td>
+						<td style="text-align:right;">extension:</td>
+						<td width="140px"><input name="extension" type="text"  style="width:135px" autocomplete="off"/></td>
+						<!-- <td style="text-align:right;">银行编号</td>
+						<td width="140px"><input name="bankCode" type="text"  style="width:135px" autocomplete="off"/></td> -->
+						<td style="padding-left:10px">
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" style="width:65px" onclick="searchFun();">查询</a>	 
+						</td>
+						<td style="padding-left:10px">
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" style="width:65px" onclick="deleteFun();">删除</a>	 
+						</td>
+						<td style="padding-left:10px">
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" style="width:65px" onclick="downloadFun();">下载</a>	 
+						</td>
+					   
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div data-options="region:'center',border:false" style="padding-bottom:100px">
+			<table id="download-files-grid"></table>
+		</div>
+	</div>

@@ -15,9 +15,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import priv.henryyu.privatebox.base.BaseComponent;
+import priv.henryyu.privatebox.entity.File;
 import priv.henryyu.privatebox.entity.User;
+import priv.henryyu.privatebox.model.request.FileQueryForm;
+import priv.henryyu.privatebox.model.request.PaginationForm;
 import priv.henryyu.privatebox.model.request.RegisterUser;
+import priv.henryyu.privatebox.model.response.DataGrid;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
+import priv.henryyu.privatebox.service.FileService;
 import priv.henryyu.privatebox.service.UserService;
 /**
  * UserController class
@@ -32,6 +37,8 @@ public class UserController extends BaseComponent{
 	private static final Log log = LogFactory.getLog(UserController.class);
 	@Autowired
 	UserService userService;
+	@Autowired
+	FileService fileService;
 	/**
 	* 新用户注册
 	* Register new user controller
@@ -62,5 +69,11 @@ public class UserController extends BaseComponent{
 	public ModelAndView showUploadFile() {
 		ModelAndView modelAndView=new ModelAndView("user/uploadFile");
 		return modelAndView;
+	}
+	
+	@RequestMapping("/queryFiles")
+	@ResponseBody
+	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm) {
+		return fileService.queryFiles(fileQueryForm);
 	}
 }

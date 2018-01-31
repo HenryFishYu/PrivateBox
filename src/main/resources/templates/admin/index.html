@@ -29,6 +29,7 @@
 	$(function() {
 		dataGrid = $('#dataGrid').datagrid({
 			url : '${ctx}/admin/queryInvitationCodes',
+			queryParams:$('#searchForm').serializeObject(),
 			fit : true,
 			fitColumns : true,
 			border : false,

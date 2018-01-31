@@ -24,7 +24,18 @@ public class File implements Serializable{
 	private boolean deleted;
 	private String username;
 	private String encryptName;
+	private Long size;
 	
+	
+	
+	public Long getSize() {
+		return size;
+	}
+
+	public void setSize(Long size) {
+		this.size = size;
+	}
+
 	public File() {
 		id=UUID.randomUUID().toString();
 		createTime=new Timestamp(System.currentTimeMillis());

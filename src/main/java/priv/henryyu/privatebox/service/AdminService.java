@@ -85,11 +85,8 @@ public class AdminService extends BaseComponent{
 			Sort sort=new Sort(Direction.fromString(invitationCodeQueryForm.getOrder()),invitationCodeQueryForm.getSort());
 			pageable=new PageRequest(invitationCodeQueryForm.getPage()-1, invitationCodeQueryForm.getRows(),sort);
 		}
-		if(invitationCodeQueryForm.getCode()==null) {
-			invitationCodeQueryForm.setCode("");
-		}
 		Page<InvitationCode> page=invitationCodeRepository.findByCreateUsernameAndCodeLike(getUser().getUsername(),"%"+invitationCodeQueryForm.getCode()+"%",pageable);
-		dataGrid.setTotal((int)page.getTotalElements());
+		dataGrid.setTotal(page.getTotalElements());
 		dataGrid.setRows(page.getContent());
 		return dataGrid;
 	}

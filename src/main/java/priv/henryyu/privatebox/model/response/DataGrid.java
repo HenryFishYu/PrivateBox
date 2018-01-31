@@ -23,7 +23,7 @@ public class DataGrid<T> implements java.io.Serializable {
 	 * 
 	 */
 
-	private int total = 0;
+	private long total = 0;
 
 	private Collection<T> rows;
 
@@ -35,11 +35,13 @@ public class DataGrid<T> implements java.io.Serializable {
 		this.rows = rows;
 	}
 
-	public int getTotal() {
+	
+
+	public long getTotal() {
 		return total;
 	}
 
-	public void setTotal(int total) {
+	public void setTotal(long total) {
 		this.total = total;
 	}
 

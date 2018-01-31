@@ -1,16 +1,21 @@
 package priv.henryyu.privatebox.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import priv.henryyu.privatebox.base.BaseComponent;
+import priv.henryyu.privatebox.model.request.FileDownloadForm;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.service.FileService;
 import priv.henryyu.privatebox.tools.Encrypt;
@@ -44,6 +49,18 @@ public class FileController extends BaseComponent{
 		ResponseMessage responseMessage=fileService.preUpload(pieceSHA512,originalFilename);
 		log.info(getUser().getUsername()+"preUpload return:"+mapper.writeValueAsString(responseMessage));
 		return responseMessage;
+	}
+	@RequestMapping("/delete")
+	@ResponseBody
+	public ResponseMessage delete(@RequestParam(value="ids[]")LinkedList<String> ids) throws IllegalStateException, IOException {
+		
+		return fileService.delete(ids);
+	}
+	@RequestMapping("/download")
+	@ResponseBody
+	public ResponseEntity<byte[]> download(FileDownloadForm fileDownloadForm) throws Exception {
+		return fileService.download(fileDownloadForm);
+		
 	}
 }
  

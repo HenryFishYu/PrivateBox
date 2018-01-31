@@ -1,5 +1,6 @@
 package priv.henryyu.privatebox.aspect;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -56,28 +58,47 @@ public class UserAspect extends BaseComponent{
 	@AfterReturning(returning="returnResult"  
 	        , pointcut="execution(* priv.henryyu.privatebox.controller..*(..)) and @annotation(org.springframework.web.bind.annotation.RequestMapping)")
     public void after(JoinPoint joinPoint,Object returnResult) throws JsonProcessingException{
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        boolean paramJsonFlag=true;
+        boolean returnJsonFlag=true;
+		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         ObjectMapper objectMapper=new ObjectMapper();
         LoginDetails loginDetails=new LoginDetails(request);
         loginDetails.setClassName(joinPoint.getTarget().getClass().toString());
-        try {
+		if (method.getName().equals("queryFiles")) {
+			paramJsonFlag = false;
+		} else {
+			for (Object object : joinPoint.getArgs()) {
+				if (object instanceof Stream) {
+					paramJsonFlag = false;
+					break;
+				}
+				if (object instanceof InputStreamSource) {
+					paramJsonFlag = false;
+					break;
+				}
+			}
+		}
+		if(returnResult instanceof HttpEntity) {
+			returnJsonFlag = false;
+		}
+        if(paramJsonFlag) {
         loginDetails.setParam(objectMapper.writeValueAsString(joinPoint.getArgs()));
+        }
+        if(returnJsonFlag) {
         loginDetails.setReturnResult(objectMapper.writeValueAsString(returnResult));
-        //System.out.println("方法式拦截"+method.getName()+" 入参:"+objectMapper.writeValueAsString(joinPoint.getArgs())
-        //+" 出参:"+objectMapper.writeValueAsString(returnResult)+" Class:"+joinPoint.getTarget().getClass().toString());
-        }catch (Exception e) {
-        	//System.out.println("error");
-		}finally {
+        }
         loginDetails.setMethodName(method.getName());
+        if(returnResult!=null) {
         loginDetails.setReturnResultClass(returnResult.getClass().toString());
+        }
         if(getUser()!=null) {
         loginDetails.setUsername(getUser().getUsername());
         }
         Destination destination = new ActiveMQQueue("loginDetails.queue"); 
         producer.sendMessage(destination, loginDetails);
         
-		}
+		
 	}
 }
  

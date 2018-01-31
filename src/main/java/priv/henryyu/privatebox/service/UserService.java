@@ -12,11 +12,13 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.stereotype.Service;
 
 import priv.henryyu.privatebox.base.BaseComponent;
+import priv.henryyu.privatebox.entity.File;
 import priv.henryyu.privatebox.entity.InvitationCode;
 import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.entity.Role;
 import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.request.RegisterUser;
+import priv.henryyu.privatebox.model.response.DataGrid;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
@@ -67,7 +69,7 @@ public class UserService extends BaseComponent implements UserDetailsService{
 		if (user == null) {
             throw new UsernameNotFoundException("User not exist");
         }
-        System.out.println("username:"+user.getUsername()+";password:"+user.getPassword());
+        //System.out.println("username:"+user.getUsername()+";password:"+user.getPassword());
         return user;
 	}
 	/**

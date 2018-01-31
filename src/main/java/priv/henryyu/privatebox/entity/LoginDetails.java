@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.servlet.http.HttpServletRequest;
 
+import org.hibernate.annotations.Type;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import nl.bitwalker.useragentutils.UserAgent;
@@ -44,9 +45,10 @@ public class LoginDetails implements Serializable{
 	private Timestamp createTime;
 	private String username;
 	private String className;
+	@Type(type="text")
 	private String param;
 	private String methodName;
-	@Column(length=2048)
+	@Type(type="text")
 	private String returnResult;
 	private String returnResultClass;
 	

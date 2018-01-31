@@ -43,8 +43,12 @@
 
 <script type="text/javascript" src="${ctx}/js/jquery.easyui.min.js"
 		charset="utf-8"></script>
-<script type="text/javascript"
-		src="${ctx}/js/easyui-lang-zh_CN.js" charset="utf-8"></script>
+<#if request.locale=="zh_CN">
+<script type="text/javascript" src="${ctx}/js/locale/easyui-lang-zh_CN.js"></script>
+</#if>
+<#if request.locale=="en_US">
+<script type="text/javascript" src="${ctx}/js/locale/easyui-lang-en.js"></script>
+</#if>
  <#nested>  
 
 </head>
