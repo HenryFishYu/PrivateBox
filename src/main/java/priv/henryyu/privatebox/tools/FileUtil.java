@@ -24,7 +24,7 @@ public class FileUtil {
 			return file;
 		}
 		
-		file.setOriginalName(originalFilename.substring(0, pointPosition-1));
+		file.setOriginalName(originalFilename.substring(0, pointPosition));
 		file.setExtension(originalFilename.substring(pointPosition, originalFilename.length()));
 		return file;
 	}

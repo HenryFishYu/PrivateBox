@@ -15,6 +15,7 @@ public enum ResponseCode {
 	IllegalInput,
 	FileExist,
 	FileNotExist,
+	IllegalFileRequest,
 	Exception;
 
 	

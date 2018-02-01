@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * XXX class
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
  * @date 2018年1月22日下午5:40:11
  * @version 1.0.0
  */
+@Component
 public class OnAuthenticationSuccessHandler implements AuthenticationSuccessHandler{
 
 	@Override

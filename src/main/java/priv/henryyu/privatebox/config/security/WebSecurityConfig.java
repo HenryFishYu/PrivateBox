@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -33,6 +34,10 @@ import priv.henryyu.privatebox.service.UserService;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+	@Autowired
+	OnAuthenticationSuccessHandler onAuthenticationSuccessHandler;
+	@Autowired
+	OnAuthenticationFailureHandler onAuthenticationFailureHandler;
 	@Bean
     UserDetailsService UserService() {
         return new UserService();
@@ -53,8 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     	//hasAnyRole("ADMIN") is the same as has hasAnyAuthority("ROLE_ADMIN")
     	.anyRequest().authenticated()
         .and().formLogin().loginPage("/").loginProcessingUrl("/login")
-        .successHandler(new OnAuthenticationSuccessHandler())
-        .failureHandler(new OnAuthenticationFailureHandler())
+        .successHandler(onAuthenticationSuccessHandler)
+        .failureHandler(onAuthenticationFailureHandler)
         .permitAll()
         .and().rememberMe()
         .and().logout().logoutSuccessUrl("/").permitAll();

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,9 +59,8 @@ public class FileController extends BaseComponent{
 	}
 	@RequestMapping("/download")
 	@ResponseBody
-	public ResponseEntity<byte[]> download(FileDownloadForm fileDownloadForm) throws Exception {
-		return fileService.download(fileDownloadForm);
-		
+	public ResponseMessage download(@RequestParam(value="ids")String[] ids) throws Exception {
+		return fileService.download(ids);
 	}
 }
  

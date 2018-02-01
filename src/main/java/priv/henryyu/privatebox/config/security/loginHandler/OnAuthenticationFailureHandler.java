@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * XXX class
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
  * @date 2018年1月23日上午9:14:19
  * @version 1.0.0
  */
+@Component
 public class OnAuthenticationFailureHandler implements AuthenticationFailureHandler{
 	@Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {

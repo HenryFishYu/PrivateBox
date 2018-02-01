@@ -106,7 +106,9 @@ public class LoginDetails implements Serializable{
 		browserType=userAgent.getBrowser().getBrowserType().toString();
 		browserManufacturer=userAgent.getBrowser().getManufacturer().toString();
 		browserRenderingEngine=userAgent.getBrowser().getRenderingEngine().toString();
+		if(browserVersion!=null) {
 		browserVersion=userAgent.getBrowserVersion().toString();
+		}
 		operatingSystem=userAgent.getOperatingSystem().toString();
 		operatingSystemDeviceType=userAgent.getOperatingSystem().getDeviceType().toString();
 		operatingSystemManufacturer=userAgent.getOperatingSystem().getManufacturer().toString();

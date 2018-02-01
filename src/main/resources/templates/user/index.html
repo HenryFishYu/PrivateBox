@@ -35,15 +35,15 @@
 	            { field:'',checkbox:true },
 	            {title : 'encryptName',field:'encryptName',hidden:true,width:100},
 	            { title: 'id', field: 'id',hidden:true,width:100},
-	            { title: '文件名称',field: 'originalName',width: 230,sortable:true,fixed:true},
-	            { title: '文件后缀',field: 'extension',width: 80,sortable:true,fixed:true},  
-	            { title: '文件大小',field: 'size',width: 100,fixed:true,sortable:true,
+	            { title: '<@spring.message 'fileOriginalName' />',field: 'originalName',width: 230,sortable:true,fixed:true},
+	            { title: '<@spring.message 'fileExtension' />',field: 'extension',width: 80,sortable:true,fixed:true},  
+	            { title: '<@spring.message 'fileSize' />',field: 'size',width: 100,fixed:true,sortable:true,
 	            	formatter : function(value,row,index){
 					if(value>0){
 						return $.formatSize(value);
 						}
 					}},
-	            { title: '创建时间',field: 'createTime',width: 150,fixed:true,sortable:true,
+	            { title: '<@spring.message 'createTime' />',field: 'createTime',width: 150,fixed:true,sortable:true,
 	            	formatter : function(value,row,index){
 					if(value>0){
 						return $.timeStamp2String(value);
@@ -81,24 +81,27 @@
     	    }
     	});
 	}
+	
 	function downloadFun(){
 		var fileArray=dataGrid.datagrid('getSelections');
+		var idArray=new Array();
 		var url="${ctx}/file/download";
-        for(var i=0;i<fileArray.length;i++){
-        	console.log(i);
-        	var form = $("<form></form>").attr("action", url).attr("method", "post").attr("target","_blank");
-        	form.append($("<input></input>").attr("type", "hidden").attr("name", "encryptName").attr("value", fileArray[i].encryptName));
+		for(var i=0;i<fileArray.length;i++){
+			idArray.push(fileArray[i].id);
+		}
+		console.log(idArray);
+        	var form = $("<form></form>").attr("action", url).attr("method", "post");
+        	/* form.append($("<input></input>").attr("type", "hidden").attr("name", "encryptName").attr("value", fileArray[i].encryptName));
         	form.append($("<input></input>").attr("type", "hidden").attr("name", "originalName").attr("value", fileArray[i].originalName));
-        	form.append($("<input></input>").attr("type", "hidden").attr("name", "extension").attr("value", fileArray[i].extension));
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "extension").attr("value", fileArray[i].extension)); */
+        	form.append($("<input></input>").attr("type", "hidden").attr("name", "ids").attr("value", idArray));
         	form.append($("<input></input>").attr("type", "hidden").attr("name", "${_csrf.parameterName}").attr("value", "${_csrf.token}"))
-            form.appendTo('body').submit().remove();
-        	console.log(form);
-        }  
+        	form.appendTo('body').submit().remove(); 
 	}
 	
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
-   <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'">admin</a><br />
+   <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a><br />
 </@authorize>
 <div id="upload-files-div"></div>
 <a id="open-upload-file-div" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
@@ -111,20 +114,20 @@
 			<form id="searchForm">
 				<table style="">
 					<tr>
-						<td style="text-align:right;">originalName:</td>
+						<td style="text-align:right;"><@spring.message 'fileOriginalName' />:</td>
 						<td width="140px"><input name="originalName" type="text"  style="width:135px" autocomplete="off"/></td>
-						<td style="text-align:right;">extension:</td>
+						<td style="text-align:right;"><@spring.message 'fileExtension' />:</td>
 						<td width="140px"><input name="extension" type="text"  style="width:135px" autocomplete="off"/></td>
 						<!-- <td style="text-align:right;">银行编号</td>
 						<td width="140px"><input name="bankCode" type="text"  style="width:135px" autocomplete="off"/></td> -->
 						<td style="padding-left:10px">
-							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" style="width:65px" onclick="searchFun();">查询</a>	 
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" style="width:65px" onclick="searchFun();"><@spring.message 'search' /></a>	 
 						</td>
 						<td style="padding-left:10px">
-							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" style="width:65px" onclick="deleteFun();">删除</a>	 
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" style="width:65px" onclick="deleteFun();"><@spring.message 'delete' /></a>	 
 						</td>
 						<td style="padding-left:10px">
-							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" style="width:65px" onclick="downloadFun();">下载</a>	 
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" style="width:80px" onclick="downloadFun();"><@spring.message 'download' /></a>	 
 						</td>
 					   
 					</tr>
@@ -135,3 +138,5 @@
 			<table id="download-files-grid"></table>
 		</div>
 	</div>
+</body>
+</html>

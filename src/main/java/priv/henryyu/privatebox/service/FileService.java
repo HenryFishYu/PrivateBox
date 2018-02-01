@@ -3,9 +3,15 @@ package priv.henryyu.privatebox.service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +38,7 @@ import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.FileRepository;
 import priv.henryyu.privatebox.repository.UniqueFileRepository;
 import priv.henryyu.privatebox.tools.Encrypt;
+import priv.henryyu.privatebox.tools.FileDownloadUtil;
 import priv.henryyu.privatebox.tools.FileUploadUtil;
 import priv.henryyu.privatebox.tools.FileUtil;
 
@@ -48,7 +55,7 @@ public class FileService extends BaseComponent {
 	private UniqueFileRepository uniqueFileRepository;
 	@Autowired
 	private FileRepository fileRepository;
-	
+	private static final String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files/";
 	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm){
 		DataGrid<File> dataGrid=new DataGrid<File>();
 		//User user=userRepository.findByUsername(getUser().getUsername());
@@ -93,33 +100,64 @@ public class FileService extends BaseComponent {
 			responseMessage.setCode(ResponseCode.Exception);
         	return responseMessage;
 		}
-		UniqueFile findUniqueFile=uniqueFileRepository.findOne(encryptFileName);
-		if(findUniqueFile!=null) {
-			responseMessage.setCode(ResponseCode.Success);
-        	return responseMessage;
-		}
+		UniqueFile uniqueFile=new UniqueFile();
+		uniqueFile.setEncryptName(encryptFileName);
+		uniqueFile.setSize(file.getSize());
+		uniqueFileRepository.save(uniqueFile);
+		priv.henryyu.privatebox.entity.File saveFile=FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile,file.getOriginalFilename(),file.getSize(),getUser().getUsername());
+		fileRepository.save(saveFile);
 		ThreadPoolExecutor threadPoolExecutor=(ThreadPoolExecutor) Executors.newCachedThreadPool();
 		threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		threadPoolExecutor.execute(new FileUploadUtil(responseMessage, getUser().getUsername(), file, path, encryptFileName, uniqueFileRepository, fileRepository));
+		threadPoolExecutor.execute(new FileUploadUtil(responseMessage,  file, path, encryptFileName));
 		return responseMessage;
 	}
-	public ResponseEntity<byte[]> download(FileDownloadForm fileDownloadForm) throws Exception{
-	     
-		String fileName = fileDownloadForm.getOriginalName() + fileDownloadForm.getExtension();
-		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files/"+fileDownloadForm.getEncryptName();
-		InputStream in = new FileInputStream(new java.io.File(path));// 将该文件加入到输入流之中
-		byte[] body = null;
-		body = new byte[in.available()];// 返回下一次对此输入流调用的方法可以不受阻塞地从此输入流读取（或跳过）的估计剩余字节数
-		in.read(body);// 读入到输入流里面
+
+	public ResponseMessage download(String[] ids) throws Exception {
+		int size=0;
+		ResponseMessage responseMessage = new ResponseMessage();
+		Iterable<File> files = fileRepository.findAll(Arrays.asList(ids));
+		for (File file : files) {
+			if (!file.getUsername().equals(getUser().getUsername())) {
+				responseMessage.setCode(ResponseCode.IllegalFileRequest);
+				return responseMessage;
+			}
+		}
+		for(File file:files) {
+			size++;
+		}
 		
-		fileName = new String(fileName.getBytes("gbk"), "iso8859-1");// 防止中文乱码
-		HttpHeaders headers = new HttpHeaders();// 设置响应头
-		headers.add("Content-Disposition", "attachment;filename=" + fileName);
-		headers.add("Content-Type","application/octet-stream");
-		HttpStatus statusCode = HttpStatus.OK;// 设置响应吗
-		ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(body, headers, statusCode);
-		return response;
-	    }
+		response.setContentType("multipart/form-data");
+		if(size<1) {
+			responseMessage.setCode(ResponseCode.Exception);
+			return responseMessage;
+		}
+		if(size==1) {
+		File targetFile=files.iterator().next();
+		String fileName=targetFile.getOriginalName()+targetFile.getExtension();
+		fileName = new String(fileName.getBytes("gbk"), "iso8859-1");
+		response.setHeader("Content-Disposition", "attachment;fileName=" + fileName);
+		java.io.File file=new java.io.File(path+targetFile.getEncryptName());
+			InputStream inputStrean=new FileInputStream(file);
+			byte[] b = new byte[2048];
+	        int length;
+	        while ((length = inputStrean.read(b)) > 0) {
+	            response.getOutputStream().write(b, 0, length);
+	        }
+	        inputStrean.close();
+		}
+		if(size>1) {
+			String zipName="";
+			for(File file:files) {
+				zipName+="&"+file.getOriginalName();
+			}
+			zipName=zipName.substring(1);
+			zipName+=".zip";
+			zipName = new String(zipName.getBytes("gbk"), "iso8859-1");
+			response.setHeader("Content-Disposition", "attachment;fileName="+zipName );
+			toZip(files,response.getOutputStream());
+		}
+		return responseMessage;
+	}
 	public ResponseMessage preUpload(String pieceSHA512,String originalFilename) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage=new ResponseMessage();
@@ -149,6 +187,33 @@ public class FileService extends BaseComponent {
 		file.setExtension(originalFilename.substring(pointPosition, originalFilename.length()));
 		return file;
 	}*/
+	public void toZip(Iterable<File> files , OutputStream out)throws RuntimeException {
+		ZipOutputStream zos = null ;
+		try {
+			zos = new ZipOutputStream(out);
+			for (File file : files) {
+				byte[] buf = new byte[2048];
+				zos.putNextEntry(new ZipEntry(file.getOriginalName()+file.getExtension()));
+				int len;
+				FileInputStream in = new FileInputStream(new java.io.File(path+file.getEncryptName()));
+				while ((len = in.read(buf)) != -1){
+					zos.write(buf, 0, len);
+				}
+				zos.closeEntry();
+				in.close();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("zip error from ZipUtils",e);
+		}finally{
+			if(zos != null){
+				try {
+					zos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }
  
 
