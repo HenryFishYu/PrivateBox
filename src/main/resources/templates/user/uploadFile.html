@@ -19,6 +19,7 @@ function addFinishedFilesFun(){
 	finishedFilesNumber++;
 	if(finishedFilesNumber==totalFilesNumber){
 		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
+		dataGrid.datagrid('clearSelections');
 	}
 }
 function startUpload(){
@@ -33,7 +34,7 @@ WebUploader.Uploader.register({
             server = me.options.server,
             deferred = WebUploader.Deferred();
         $.ajax({
-    	    url: "../file/preUpload",
+    	    url: "${ctx}/file/preUpload",
     	    data:{
     	    	pieceSHA512:file.pieceSHA512,
     	    	originalFilename:file.name
@@ -81,6 +82,8 @@ $(document).ready(function(){
         }
         reader.onload = function(){
         	addReadyFilesFun();
+        	uploadGrid.datagrid('updateRow',
+                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{pieceSHA512:(100).toFixed(2)+"%"}});
             var pieceArrayBuffer=this.result.slice(0,1000000);
         	var pieceWordArray=CryptoJS.lib.WordArray.create(pieceArrayBuffer);
         	var pieceSHA512=CryptoJS.SHA512(pieceWordArray).toString();

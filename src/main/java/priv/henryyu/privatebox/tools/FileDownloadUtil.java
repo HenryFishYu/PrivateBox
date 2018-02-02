@@ -1,7 +1,9 @@
 package priv.henryyu.privatebox.tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -18,37 +20,32 @@ import priv.henryyu.privatebox.entity.File;
  */
 public class FileDownloadUtil implements Runnable {
 
-	private String path;
-	private Iterable<File> files;
-	private OutputStream outputStream;
-	private boolean singleFile;
-	public FileDownloadUtil(String path, Iterable<File> files, OutputStream outputStream,boolean singleFile) {
+	private Object stream;
+	private byte[] bytes;
+
+	
+	
+	public FileDownloadUtil(Object stream, byte[] bytes) {
 		super();
-		this.path = path;
-		this.files = files;
-		this.outputStream = outputStream;
-		this.singleFile=singleFile;
+		this.stream = stream;
+		this.bytes = bytes;
 	}
+
+
 
 	@Override
 	public void run(){
 		// TODO Auto-generated method stub
-		if(singleFile) {
-			
-			java.io.File file=new java.io.File(path+files.iterator().next().getEncryptName());
+		if(stream instanceof FileInputStream) {
 			try {
-				InputStream inputStrean=new FileInputStream(file);
-				byte[] b = new byte[2048];
-		        int length;
-		        while ((length = inputStrean.read(b)) > 0) {
-		            outputStream.write(b, 0, length);
-		        }
-
-		        // 这里主要关闭。
-			} catch (Exception e) {
+				((FileInputStream) stream).read(bytes);
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		if(stream instanceof ByteArrayOutputStream) {
+			bytes=((ByteArrayOutputStream) stream).toByteArray();
 		}
 	}
 

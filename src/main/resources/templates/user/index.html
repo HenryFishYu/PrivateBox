@@ -14,9 +14,12 @@
 		    href:'showUploadFile',
 		    closed:true
 		});
-		$("#open-upload-file-div").click(function(){
+		$("#open-upload-file-button").click(function(){
 			$('#upload-files-div').window("open");
-		})
+		});
+		$("#logout-button").click(function(){
+			$("#logout-form").submit();
+		});
 		dataGrid = $("#download-files-grid").datagrid({
 			url : '${ctx}/user/queryFiles',
 			queryParams:$('#searchForm').serializeObject(),
@@ -101,13 +104,13 @@
 	
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
-   <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a><br />
+   <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a>
 </@authorize>
 <div id="upload-files-div"></div>
-<a id="open-upload-file-div" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
-<form action="../logout" method="post">
+<a id="open-upload-file-button" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
+<a id="logout-button" class="easyui-linkbutton" data-options="iconCls:'icon-remove'"><@spring.message 'logout' /></a>
+<form action="../logout" method="post" id="logout-form" style="display:none">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-	<input type="submit" value="<@spring.message 'logout' />">
 </form>
 	<div class="easyui-layout" data-options="fit : true,border : false">
 		<div data-options="region:'north',border:false" style="height: 40px; overflow: hidden;">

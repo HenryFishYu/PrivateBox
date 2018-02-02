@@ -59,7 +59,7 @@ public class FileController extends BaseComponent{
 	}
 	@RequestMapping("/download")
 	@ResponseBody
-	public ResponseMessage download(@RequestParam(value="ids")String[] ids) throws Exception {
+	public ResponseEntity<byte[]> download(@RequestParam(value="ids")String[] ids) throws Exception {
 		return fileService.download(ids);
 	}
 }

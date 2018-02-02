@@ -1,5 +1,6 @@
 package priv.henryyu.privatebox.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +9,14 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import javax.annotation.processing.Filer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -73,22 +78,20 @@ public class FileService extends BaseComponent {
 		return dataGrid;
 	}
 	
-	@SuppressWarnings("finally")
 	public ResponseMessage<File> delete(List<String> ids) {
-		ResponseMessage<File> responseMessage=new ResponseMessage<File>();
+		ResponseMessage<File> responseMessage = new ResponseMessage<File>();
 		try {
-				Iterable<File> files = fileRepository.findAll(ids);
-				for(File file:files) {
-					file.setDeleted(true);
-				}
-				fileRepository.save(files);
+			Iterable<File> files = fileRepository.findAll(ids);
+			for (File file : files) {
+				file.setDeleted(true);
+			}
+			fileRepository.save(files);
 			responseMessage.setCode(ResponseCode.Success);
 		} catch (Exception e) {
 			e.printStackTrace();
 			responseMessage.setCode(ResponseCode.Exception);
-		} finally {
-			return responseMessage;
 		}
+		return responseMessage;
 	}
 	public ResponseMessage upload(MultipartFile file) throws IllegalStateException, IOException {
 		ResponseMessage responseMessage=new ResponseMessage();
@@ -106,58 +109,57 @@ public class FileService extends BaseComponent {
 		uniqueFileRepository.save(uniqueFile);
 		priv.henryyu.privatebox.entity.File saveFile=FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile,file.getOriginalFilename(),file.getSize(),getUser().getUsername());
 		fileRepository.save(saveFile);
-		ThreadPoolExecutor threadPoolExecutor=(ThreadPoolExecutor) Executors.newCachedThreadPool();
-		threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		threadPoolExecutor.execute(new FileUploadUtil(responseMessage,  file, path, encryptFileName));
+		ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4,100,60000,TimeUnit.MICROSECONDS, new LinkedBlockingQueue(400),new ThreadPoolExecutor.CallerRunsPolicy());
+        threadPoolExecutor.execute(
+                () -> {
+                    java.io.File targetFile = new java.io.File(path,uniqueFile.getEncryptName() );
+                    try {
+                        file.transferTo(targetFile);
+                        responseMessage.setCode(ResponseCode.Success);
+                    } catch (Exception e) {
+                        responseMessage.setCode(ResponseCode.Exception);
+                        e.printStackTrace();
+                    }
+                });
 		return responseMessage;
 	}
 
-	public ResponseMessage download(String[] ids) throws Exception {
-		int size=0;
-		ResponseMessage responseMessage = new ResponseMessage();
-		Iterable<File> files = fileRepository.findAll(Arrays.asList(ids));
-		for (File file : files) {
-			if (!file.getUsername().equals(getUser().getUsername())) {
-				responseMessage.setCode(ResponseCode.IllegalFileRequest);
-				return responseMessage;
-			}
+	public ResponseEntity<byte[]> download(String[] ids) throws Exception{
+		if(ids.length==0) {
+			return null;
 		}
-		for(File file:files) {
-			size++;
+		String fileName=null;
+		byte[] body = null;
+		ThreadPoolExecutor threadPoolExecutor= new ThreadPoolExecutor(4,100,60000,TimeUnit.MICROSECONDS, new LinkedBlockingQueue(400),new ThreadPoolExecutor.CallerRunsPolicy());
+		//threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+		if(ids.length==1) {
+	    File file=fileRepository.findOne(ids[0]);
+		fileName = file.getOriginalName() + file.getExtension();
+		InputStream in = new FileInputStream(new java.io.File(path+file.getEncryptName()));// 将该文件加入到输入流之中
+		body = new byte[in.available()];// 返回下一次对此输入流调用的方法可以不受阻塞地从此输入流读取（或跳过）的估计剩余字节数
+		threadPoolExecutor.execute(new FileDownloadUtil(in, body ));
 		}
-		
-		response.setContentType("multipart/form-data");
-		if(size<1) {
-			responseMessage.setCode(ResponseCode.Exception);
-			return responseMessage;
-		}
-		if(size==1) {
-		File targetFile=files.iterator().next();
-		String fileName=targetFile.getOriginalName()+targetFile.getExtension();
-		fileName = new String(fileName.getBytes("gbk"), "iso8859-1");
-		response.setHeader("Content-Disposition", "attachment;fileName=" + fileName);
-		java.io.File file=new java.io.File(path+targetFile.getEncryptName());
-			InputStream inputStrean=new FileInputStream(file);
-			byte[] b = new byte[2048];
-	        int length;
-	        while ((length = inputStrean.read(b)) > 0) {
-	            response.getOutputStream().write(b, 0, length);
-	        }
-	        inputStrean.close();
-		}
-		if(size>1) {
-			String zipName="";
+		if(ids.length>1) {
+			Iterable<File> files=fileRepository.findAll(Arrays.asList(ids));
+			ByteArrayOutputStream out=new ByteArrayOutputStream();
+			toZip(files, out);
+			body=out.toByteArray();
+			//threadPoolExecutor.execute(new FileDownloadUtil(out, body ));//toByteArray() is a synchronized method
+			fileName="";
 			for(File file:files) {
-				zipName+="&"+file.getOriginalName();
+				fileName+="&"+file.getOriginalName();
 			}
-			zipName=zipName.substring(1);
-			zipName+=".zip";
-			zipName = new String(zipName.getBytes("gbk"), "iso8859-1");
-			response.setHeader("Content-Disposition", "attachment;fileName="+zipName );
-			toZip(files,response.getOutputStream());
+			fileName=fileName.substring(1);
+			fileName+=".zip";
 		}
-		return responseMessage;
-	}
+		fileName = new String(fileName.getBytes("gbk"), "iso8859-1");// 防止中文乱码
+		HttpHeaders headers = new HttpHeaders();// 设置响应头
+		headers.add("Content-Disposition", "attachment;filename=" + fileName);
+		headers.add("Content-Type","application/octet-stream");
+		HttpStatus statusCode = HttpStatus.OK;// 设置响应吗
+		ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(body, headers, statusCode);
+		return response;
+	    }
 	public ResponseMessage preUpload(String pieceSHA512,String originalFilename) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage=new ResponseMessage();
