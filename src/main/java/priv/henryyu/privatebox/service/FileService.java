@@ -60,24 +60,42 @@ public class FileService extends BaseComponent {
 	private UniqueFileRepository uniqueFileRepository;
 	@Autowired
 	private FileRepository fileRepository;
-	private static final String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files/";
-	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm){
-		DataGrid<File> dataGrid=new DataGrid<File>();
-		//User user=userRepository.findByUsername(getUser().getUsername());
+	private static final String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()
+			+ "files/";
+	/**
+	* 查询所有文件
+	* Query all Files update by self
+	* @param 文件查询表单 
+	* FileQueryForm
+	* @return DataGrid
+	* @throws Exception
+	*/
+	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm) {
+		DataGrid<File> dataGrid = new DataGrid<File>();
+		// User user=userRepository.findByUsername(getUser().getUsername());
 		Pageable pageable;
-		if(fileQueryForm.getSort()==null||fileQueryForm.getOrder()==null) {
-			Sort sort=new Sort(Direction.ASC,"createTime");
-			pageable=new PageRequest(fileQueryForm.getPage()-1, fileQueryForm.getRows(),sort);
-		}else {
-			Sort sort=new Sort(Direction.fromString(fileQueryForm.getOrder()),fileQueryForm.getSort());
-			pageable=new PageRequest(fileQueryForm.getPage()-1, fileQueryForm.getRows(),sort);
+		if (fileQueryForm.getSort() == null || fileQueryForm.getOrder() == null) {
+			Sort sort = new Sort(Direction.ASC, "createTime");
+			pageable = new PageRequest(fileQueryForm.getPage() - 1, fileQueryForm.getRows(), sort);
+		} else {
+			Sort sort = new Sort(Direction.fromString(fileQueryForm.getOrder()), fileQueryForm.getSort());
+			pageable = new PageRequest(fileQueryForm.getPage() - 1, fileQueryForm.getRows(), sort);
 		}
-		Page<File> page=fileRepository.findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeleted(getUser().getUsername(), "%"+fileQueryForm.getOriginalName()+"%", "%"+fileQueryForm.getExtension()+"%",false, pageable);
+		Page<File> page = fileRepository.findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeleted(
+				getUser().getUsername(), "%" + fileQueryForm.getOriginalName() + "%",
+				"%" + fileQueryForm.getExtension() + "%", false, pageable);
 		dataGrid.setRows(page.getContent());
 		dataGrid.setTotal(page.getTotalElements());
 		return dataGrid;
 	}
-	
+	/**
+	* 删除文件
+	* Detele Files
+	* @param 文件ids 
+	* ids
+	* @return ResponseMessage
+	* @throws Exception
+	*/
 	public ResponseMessage<File> delete(List<String> ids) {
 		ResponseMessage<File> responseMessage = new ResponseMessage<File>();
 		try {
@@ -93,121 +111,143 @@ public class FileService extends BaseComponent {
 		}
 		return responseMessage;
 	}
-	public ResponseMessage upload(MultipartFile file) throws IllegalStateException, IOException {
-		ResponseMessage responseMessage=new ResponseMessage();
-		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()+"files";
+	/**
+	* 上传文件
+	* Upload Files
+	* @param 文件 
+	* MultipartFile
+	* @return ResponseMessage
+	* @throws Exception
+	*/
+	public ResponseMessage upload(MultipartFile file) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files";
 		String encryptFileName;
-		try{
-			encryptFileName=Encrypt.EncodeMultipartFile(file, "SHA-512",0,1000000);
-		}catch (Exception e) {
+		try {
+			encryptFileName = Encrypt.EncodeMultipartFile(file, "SHA-512", 0, 1000000);
+		} catch (Exception e) {
 			responseMessage.setCode(ResponseCode.Exception);
-        	return responseMessage;
+			return responseMessage;
 		}
-		UniqueFile uniqueFile=new UniqueFile();
+		UniqueFile uniqueFile = new UniqueFile();
 		uniqueFile.setEncryptName(encryptFileName);
 		uniqueFile.setSize(file.getSize());
 		uniqueFileRepository.save(uniqueFile);
-		priv.henryyu.privatebox.entity.File saveFile=FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile,file.getOriginalFilename(),file.getSize(),getUser().getUsername());
+		priv.henryyu.privatebox.entity.File saveFile = FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile,
+				file.getOriginalFilename(), file.getSize(), getUser().getUsername());
 		fileRepository.save(saveFile);
-		ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4,100,60000,TimeUnit.MICROSECONDS, new LinkedBlockingQueue(400),new ThreadPoolExecutor.CallerRunsPolicy());
-        threadPoolExecutor.execute(
-                () -> {
-                    java.io.File targetFile = new java.io.File(path,uniqueFile.getEncryptName() );
-                    try {
-                        file.transferTo(targetFile);
-                        responseMessage.setCode(ResponseCode.Success);
-                    } catch (Exception e) {
-                        responseMessage.setCode(ResponseCode.Exception);
-                        e.printStackTrace();
-                    }
-                });
+		ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 100, 60000, TimeUnit.MICROSECONDS,
+				new LinkedBlockingQueue(400), new ThreadPoolExecutor.CallerRunsPolicy());
+		threadPoolExecutor.execute(() -> {
+			java.io.File targetFile = new java.io.File(path, uniqueFile.getEncryptName());
+			try {
+				file.transferTo(targetFile);
+				responseMessage.setCode(ResponseCode.Success);
+			} catch (Exception e) {
+				responseMessage.setCode(ResponseCode.Exception);
+				e.printStackTrace();
+			}
+		});
 		return responseMessage;
 	}
-
-	public ResponseEntity<byte[]> download(String[] ids) throws Exception{
-		if(ids.length==0) {
+	/**
+	* 下载文件
+	* Download Files
+	* @param 文件ids 
+	* ids
+	* @return ResponseEntity<byte[]>
+	* @throws Exception
+	*/
+	public ResponseEntity<byte[]> download(String[] ids) throws Exception {
+		if (ids.length == 0) {
 			return null;
 		}
-		String fileName=null;
+		String fileName = null;
 		byte[] body = null;
-		ThreadPoolExecutor threadPoolExecutor= new ThreadPoolExecutor(4,100,60000,TimeUnit.MICROSECONDS, new LinkedBlockingQueue(400),new ThreadPoolExecutor.CallerRunsPolicy());
-		//threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		if(ids.length==1) {
-	    File file=fileRepository.findOne(ids[0]);
-		fileName = file.getOriginalName() + file.getExtension();
-		InputStream in = new FileInputStream(new java.io.File(path+file.getEncryptName()));// 将该文件加入到输入流之中
-		body = new byte[in.available()];// 返回下一次对此输入流调用的方法可以不受阻塞地从此输入流读取（或跳过）的估计剩余字节数
-		threadPoolExecutor.execute(new FileDownloadUtil(in, body ));
+		ThreadPoolExecutor threadPoolExecutor = null;
+		// threadPoolExecutor.setRejectedExecutionHandler(new
+		// ThreadPoolExecutor.CallerRunsPolicy());
+		if (ids.length == 1) {
+			threadPoolExecutor = new ThreadPoolExecutor(4, 100, 60000, TimeUnit.MICROSECONDS,
+					new LinkedBlockingQueue(400), new ThreadPoolExecutor.CallerRunsPolicy());
+			File file = fileRepository.findOne(ids[0]);
+			fileName = file.getOriginalName() + file.getExtension();
+			InputStream in = new FileInputStream(new java.io.File(path + file.getEncryptName()));// 将该文件加入到输入流之中
+			body = new byte[in.available()];// 返回下一次对此输入流调用的方法可以不受阻塞地从此输入流读取（或跳过）的估计剩余字节数
+			threadPoolExecutor.execute(new FileDownloadUtil(in, body));
 		}
-		if(ids.length>1) {
-			Iterable<File> files=fileRepository.findAll(Arrays.asList(ids));
-			ByteArrayOutputStream out=new ByteArrayOutputStream();
+		if (ids.length > 1) {
+			Iterable<File> files = fileRepository.findAll(Arrays.asList(ids));
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			toZip(files, out);
-			body=out.toByteArray();
-			//threadPoolExecutor.execute(new FileDownloadUtil(out, body ));//toByteArray() is a synchronized method
-			fileName="";
-			for(File file:files) {
-				fileName+="&"+file.getOriginalName();
+			body = out.toByteArray();
+			// threadPoolExecutor.execute(new FileDownloadUtil(out, body ));//toByteArray()
+			// is a synchronized method
+			fileName = "";
+			for (File file : files) {
+				fileName += "&" + file.getOriginalName();
 			}
-			fileName=fileName.substring(1);
-			fileName+=".zip";
+			fileName = fileName.substring(1);
+			fileName += ".zip";
 		}
 		fileName = new String(fileName.getBytes("gbk"), "iso8859-1");// 防止中文乱码
 		HttpHeaders headers = new HttpHeaders();// 设置响应头
 		headers.add("Content-Disposition", "attachment;filename=" + fileName);
-		headers.add("Content-Type","application/octet-stream");
+		headers.add("Content-Type", "application/octet-stream");
 		HttpStatus statusCode = HttpStatus.OK;// 设置响应吗
 		ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(body, headers, statusCode);
 		return response;
-	    }
-	public ResponseMessage preUpload(String pieceSHA512,String originalFilename) {
+	}
+	/**
+	* 预上传文件，校验二进制文件值的前1000000位SHA512值
+	* PreUpload Files,Check the 1000000Bit Binary SHA512
+	* @param 前1000000位SHA512值,文件原名 
+	* 1000000Bit Binary SHA512,originalFilename
+	* @return ResponseMessage
+	* @throws Exception
+	*/
+	public ResponseMessage preUpload(String pieceSHA512, String originalFilename) {
 		// TODO Auto-generated method stub
-		ResponseMessage responseMessage=new ResponseMessage();
-		String encryptFileName=pieceSHA512;
-		UniqueFile uniqueFile=uniqueFileRepository.findOne(encryptFileName);
-		if(uniqueFile==null) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		String encryptFileName = pieceSHA512;
+		UniqueFile uniqueFile = uniqueFileRepository.findOne(encryptFileName);
+		if (uniqueFile == null) {
 			responseMessage.setCode(ResponseCode.FileNotExist);
 			return responseMessage;
 		}
-		File saveFile=FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile,originalFilename,uniqueFile.getSize(), getUser().getUsername());
+		File saveFile = FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile, originalFilename,
+				uniqueFile.getSize(), getUser().getUsername());
 		responseMessage.setCode(ResponseCode.FileExist);
 		fileRepository.save(saveFile);
 		return responseMessage;
 	}
-	/*private File getFileByMultipartFileAndUniqueFile(UniqueFile uniqueFile,MultipartFile multipartFile) {
-		File file=new File();
-		file.setDeleted(false);
-		file.setEncryptName(uniqueFile.getEncryptName());
-		file.setUsername(getUser().getUsername());
-		String originalFilename=multipartFile.getOriginalFilename();
-		int pointPosition=originalFilename.lastIndexOf('.');
-		if(pointPosition<0) {
-			file.setOriginalName(originalFilename);
-			return file;
-		}
-		file.setOriginalName(originalFilename.substring(0, pointPosition-1));
-		file.setExtension(originalFilename.substring(pointPosition, originalFilename.length()));
-		return file;
-	}*/
-	public void toZip(Iterable<File> files , OutputStream out)throws RuntimeException {
-		ZipOutputStream zos = null ;
+
+	/**
+	* 将多文件压缩成Zip文件
+	* Compress Files to Zip
+	* @param 输入文件,输出流 
+	* Iterable<File>,OutputStream
+	* @throws RuntimeException
+	*/
+	private void toZip(Iterable<File> files, OutputStream out) throws RuntimeException {
+		ZipOutputStream zos = null;
 		try {
 			zos = new ZipOutputStream(out);
 			for (File file : files) {
 				byte[] buf = new byte[2048];
-				zos.putNextEntry(new ZipEntry(file.getOriginalName()+file.getExtension()));
+				zos.putNextEntry(new ZipEntry(file.getOriginalName() + file.getExtension()));
 				int len;
-				FileInputStream in = new FileInputStream(new java.io.File(path+file.getEncryptName()));
-				while ((len = in.read(buf)) != -1){
+				FileInputStream in = new FileInputStream(new java.io.File(path + file.getEncryptName()));
+				while ((len = in.read(buf)) != -1) {
 					zos.write(buf, 0, len);
 				}
 				zos.closeEntry();
 				in.close();
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("zip error from ZipUtils",e);
-		}finally{
-			if(zos != null){
+			throw new RuntimeException("zip error from ZipUtils", e);
+		} finally {
+			if (zos != null) {
 				try {
 					zos.close();
 				} catch (IOException e) {
@@ -217,5 +257,3 @@ public class FileService extends BaseComponent {
 		}
 	}
 }
- 
-

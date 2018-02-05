@@ -11,8 +11,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy
 public class Run {
 	public static void main(String args[]) {
-		SpringApplication.run(Run.class, args);
-		
-		
+		SpringApplication.run(Run.class, args);		
 	}
 }

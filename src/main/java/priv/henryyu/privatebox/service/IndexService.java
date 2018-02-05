@@ -16,17 +16,20 @@ import priv.henryyu.privatebox.repository.LoginDetailsRepository;
  * @version 1.0.0
  */
 @Service
-public class IndexService extends BaseComponent{
+public class IndexService extends BaseComponent {
 	@Autowired
 	LoginDetailsRepository loginDetailsRepository;
-	
-	public ResponseMessage<LoginDetails> saveLoginDetails(){
-		ResponseMessage<LoginDetails> responseMessage=new ResponseMessage<LoginDetails>();
-		LoginDetails loginDetails=new LoginDetails(request);
-		LoginDetails savedLoginDetails=loginDetailsRepository.save(loginDetails);
+	/**
+	* 保存浏览记录
+	* Save Login Details
+	* @return ResponseMessage
+	*/
+	public ResponseMessage<LoginDetails> saveLoginDetails() {
+		ResponseMessage<LoginDetails> responseMessage = new ResponseMessage<LoginDetails>();
+		LoginDetails loginDetails = new LoginDetails(request);
+		LoginDetails savedLoginDetails = loginDetailsRepository.save(loginDetails);
 		responseMessage.setData(savedLoginDetails);
 		return responseMessage;
 	}
 }
- 
 

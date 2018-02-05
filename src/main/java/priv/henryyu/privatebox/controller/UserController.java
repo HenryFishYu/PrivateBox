@@ -64,16 +64,20 @@ public class UserController extends BaseComponent{
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;
 	}
-	
+
 	@RequestMapping("/showUploadFile")
 	public ModelAndView showUploadFile() {
+		log.info(getUser().getUsername()+"--showUploadFile");
 		ModelAndView modelAndView=new ModelAndView("user/uploadFile");
 		return modelAndView;
 	}
 	
-	@RequestMapping("/queryFiles")
+	@RequestMapping("/queryFiles")     
 	@ResponseBody
-	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm) {
-		return fileService.queryFiles(fileQueryForm);
+	public DataGrid<File> queryFiles(FileQueryForm fileQueryForm) throws JsonProcessingException {
+		log.info(getUser().getUsername()+" queryFiles FileQueryForm:"+mapper.writeValueAsString(fileQueryForm));
+		DataGrid<File> dataGrid=fileService.queryFiles(fileQueryForm);
+		log.info(getUser().getUsername()+" queryFiles result:"+mapper.writeValueAsString(dataGrid ));
+		return dataGrid;
 	}
 }

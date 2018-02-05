@@ -53,8 +53,11 @@ public class AdminController extends BaseComponent{
 	
 	@RequestMapping("/queryInvitationCodes")
 	@ResponseBody
-	public DataGrid queryInvitationCodes(InvitationCodeQueryForm invitationCodeQueryForm) {
-		return adminService.queryInvitationCodes(invitationCodeQueryForm);
+	public DataGrid queryInvitationCodes(InvitationCodeQueryForm invitationCodeQueryForm) throws JsonProcessingException {
+		log.info(getUser().getUsername()+" queryInvitationCodes InvitationCodeQueryForm"+mapper.writeValueAsString(invitationCodeQueryForm));
+		DataGrid dataGrid=adminService.queryInvitationCodes(invitationCodeQueryForm);
+		log.info(getUser().getUsername()+" queryInvitationCodes result:"+mapper.writeValueAsString(dataGrid));
+		return dataGrid;
 	}
 }
  

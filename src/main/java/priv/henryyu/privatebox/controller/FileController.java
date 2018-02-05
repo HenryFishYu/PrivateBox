@@ -54,12 +54,15 @@ public class FileController extends BaseComponent{
 	@RequestMapping("/delete")
 	@ResponseBody
 	public ResponseMessage delete(@RequestParam(value="ids[]")LinkedList<String> ids) throws IllegalStateException, IOException {
-		
-		return fileService.delete(ids);
+		log.info(getUser().getUsername()+" delete Files,id="+mapper.writeValueAsString(ids));
+		ResponseMessage responseMessage=fileService.delete(ids);
+		log.info(getUser().getUsername()+" delete Files result:"+mapper.writeValueAsString(responseMessage));
+		return responseMessage;
 	}
 	@RequestMapping("/download")
 	@ResponseBody
 	public ResponseEntity<byte[]> download(@RequestParam(value="ids")String[] ids) throws Exception {
+		log.info(getUser().getUsername()+" dwonload Files,id="+mapper.writeValueAsString(ids));
 		return fileService.download(ids);
 	}
 }
