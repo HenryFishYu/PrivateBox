@@ -25,6 +25,7 @@ import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
+import priv.henryyu.privatebox.siglton.Siglton;
 import priv.henryyu.privatebox.tools.Encrypt;
 
 import static org.springframework.beans.BeanUtils.copyProperties;
@@ -103,6 +104,7 @@ public class UserService extends BaseComponent implements UserDetailsService {
 			jpaResponseMessage.setCode(ResponseCode.UsedInvitationCode);
 			return jpaResponseMessage;
 		}
+		user.setEnabled(false);
 		User savedUser = userRepository.save(user);
 		invitationCode.setUsedUsername(savedUser.getUsername());
 		invitationCode.setUsed(true);
@@ -111,11 +113,16 @@ public class UserService extends BaseComponent implements UserDetailsService {
 		jpaResponseMessage.setCode(ResponseCode.Success);
 		String message = messageSource.getMessage("registerSuccess", null, locale);
 		jpaResponseMessage.setMessage(message + "------" + savedUser.getUsername());
+		getSession().setAttribute("registerUsername", savedUser.getUsername());
 		// jpaResponseMessage.setData(savedUser);
 		return jpaResponseMessage;
 
 	}
-
+	
+	public ResponseMessage sendActiveEmail() {
+		String registerUsername=(String) getSession().getAttribute("registerUsername");
+		Siglton.INSTANCE.getRegisterMap().get(registerUsername);
+	}
 	/**
 	 * 初始化权限操作 Authority Initialization
 	 * 

@@ -2,8 +2,14 @@ package priv.henryyu.privatebox.base;
 
 import java.io.File;
 
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import priv.henryyu.privatebox.controller.UserController;
@@ -24,6 +30,7 @@ public class Startup implements CommandLineRunner{
 	private UserService userService;
 	@Autowired
 	private RoleRepository roleRepository;
+
 	@Override
 	public void run(String... arg0) throws Exception {
 		// TODO Auto-generated method stub
@@ -35,6 +42,7 @@ public class Startup implements CommandLineRunner{
 			System.out.println("Generate File Folder");
 		}
 		System.out.println("PrivateBox Run");
+		
 	}
 
 }

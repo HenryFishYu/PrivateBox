@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.SecurityTest</groupId>
-    <artifactId>SecurityTest</artifactId>
+    <groupId>priv.henryyu</groupId>
+    <artifactId>PrivateBox</artifactId>
     <version>1.0-SNAPSHOT</version>
     <!-- Spring boot 父引用-->
     <parent>
@@ -104,6 +104,20 @@
             <groupId>org.springframework.boot</groupId>  
             <artifactId>spring-boot-starter-activemq</artifactId>  
         </dependency> 
+        <dependency>
+        	<groupId>net.jodah</groupId>
+  			<artifactId>expiringmap</artifactId>
+			<version>0.5.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-mail</artifactId>
+		    <version>1.5.10.RELEASE</version>
+		</dependency>
+
+		
+
 </dependencies>
 
 </project>

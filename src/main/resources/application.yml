@@ -4,6 +4,15 @@ logging:
   path:
     log
 spring:
+  mail:  
+      host: smtp.163.com  
+      username: yuhaolun8888@163.com  
+      password: hyiechyiec
+      properties:  
+          mail:   
+              smtp:  
+                  auth: true  
+                  timeout: 50000 
   activemq:
     packages:
       trust-all:
