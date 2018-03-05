@@ -4,14 +4,15 @@ import java.util.Map;
 
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import priv.henryyu.privatebox.model.RegisterEmailEntity;
 
 public enum Siglton {
 	INSTANCE;
-	private ExpiringMap<String, Object> registerMap = ExpiringMap.builder()
+	private ExpiringMap<String, RegisterEmailEntity> registerMap = ExpiringMap.builder()
 			  .variableExpiration()
 			  .build();
 
-	public Map getRegisterMap() {
+	public ExpiringMap<String, RegisterEmailEntity> getRegisterExpiringMap() {
 		return registerMap;
 	}
 	

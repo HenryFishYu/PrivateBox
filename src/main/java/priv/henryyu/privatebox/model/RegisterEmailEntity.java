@@ -1,22 +1,25 @@
 package priv.henryyu.privatebox.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class RegisterEmailEntity {
-	private long lastRequestTimeMillis;
+public class RegisterEmailEntity implements Serializable{
 	private int totalRequestTimes;
 	private String activationCode;
+	private String registerUsername;
 	public RegisterEmailEntity() {
-		this.lastRequestTimeMillis = System.currentTimeMillis();
 		this.totalRequestTimes = 1;
 		this.activationCode = UUID.randomUUID().toString();
 	}
-	public long getLastRequestTimeMillis() {
-		return lastRequestTimeMillis;
+	
+	public String getRegisterUsername() {
+		return registerUsername;
 	}
-	public void setLastRequestTimeMillis(long lastRequestTimeMillis) {
-		this.lastRequestTimeMillis = lastRequestTimeMillis;
+
+	public void setRegisterUsername(String registerUsername) {
+		this.registerUsername = registerUsername;
 	}
+
 	public int getTotalRequestTimes() {
 		return totalRequestTimes;
 	}

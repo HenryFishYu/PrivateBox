@@ -80,4 +80,10 @@ public class UserController extends BaseComponent{
 		log.info(getUser().getUsername()+" queryFiles result:"+mapper.writeValueAsString(dataGrid ));
 		return dataGrid;
 	}
+	@RequestMapping("/emailTest")
+	@ResponseBody
+	public ResponseMessage emailTest(String username) {
+		return userService.sendActiveEmail(username);
+	}
+	
 }

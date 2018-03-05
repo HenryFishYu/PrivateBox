@@ -13,6 +13,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
+import priv.henryyu.privatebox.base.BaseComponent;
+
 /**
  * XXX class
  * 
@@ -24,18 +26,19 @@ import org.springframework.stereotype.Component;
 public class OnAuthenticationFailureHandler implements AuthenticationFailureHandler{
 	@Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        if(e instanceof BadCredentialsException) {
+		httpServletResponse.setContentType("application/json;charset=utf-8");
+		PrintWriter out = httpServletResponse.getWriter();
+		if(e instanceof BadCredentialsException) {
         	
         }
         if(e instanceof DisabledException) {
-        	
+            out.write("{\"status\":\"error\"}");
+            out.flush();
+            out.close();
         }
-		e.printStackTrace();
-		httpServletResponse.setContentType("application/json;charset=utf-8");
-        PrintWriter out = httpServletResponse.getWriter();
-        out.write("{\"status\":\"error\"}");
-        out.flush();
-        out.close();
+		//e.printStackTrace();
+		
+        
     }
 }
  

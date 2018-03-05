@@ -1,6 +1,8 @@
 package priv.henryyu.privatebox.jms;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import priv.henryyu.privatebox.entity.LoginDetails;
+import priv.henryyu.privatebox.model.RegisterEmailEntity;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 
 /**
@@ -33,13 +36,15 @@ public class Consumer {
         //System.out.println("Consumer收到的报文为:"+loginDetails);  
     } 
 	@JmsListener(destination = "sendEmail.queue")  
-    public void receiveQueue(String string) throws MessagingException {
+    public void receiveQueue(RegisterEmailEntity registerEmailEntity) throws MessagingException {
+		String activeURL="http://192.168.108.69:9090/activeAccount?registerUsername="+registerEmailEntity.getRegisterUsername()+"&activationCode="+registerEmailEntity.getActivationCode();
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		mimeMessage.addRecipients(Message.RecipientType.CC, InternetAddress.parse("yuhaolun8888@163.com"));
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 		helper.setFrom("yuhaolun8888@163.com");
-		helper.setTo("448780883@qq.com");
+		helper.setTo(registerEmailEntity.getRegisterUsername());
 		helper.setSubject("Welcome Register PrivateBox");
-		helper.setText("<html><body><a href='https://www.douyu.com/58428'>baidu</a></body></html>", true);
+		helper.setText("<html><body><a href='"+activeURL+"'>"+activeURL+"</a></body></html>", true);
 		mailSender.send(mimeMessage);
     } 
 }

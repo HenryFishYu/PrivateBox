@@ -7,6 +7,7 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import priv.henryyu.privatebox.entity.LoginDetails;
+import priv.henryyu.privatebox.model.RegisterEmailEntity;
 
 /**
  * XXX class
@@ -27,6 +28,9 @@ public class Producer {
         jmsTemplate.convertAndSend(destination, message);  
     }
     public void sendMessage(Destination destination, final LoginDetails message){  
+        jmsTemplate.convertAndSend(destination, message);  
+    }
+    public void sendMessage(Destination destination, final RegisterEmailEntity message){  
         jmsTemplate.convertAndSend(destination, message);  
     }
 }

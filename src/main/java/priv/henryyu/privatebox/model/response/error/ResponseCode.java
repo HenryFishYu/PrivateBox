@@ -16,6 +16,8 @@ public enum ResponseCode {
 	FileExist,
 	FileNotExist,
 	IllegalFileRequest,
+	OutOfTimeLimit,
+	UserAlreadyActived,
 	Exception;
 
 	
