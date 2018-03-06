@@ -42,6 +42,7 @@ import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.FileRepository;
 import priv.henryyu.privatebox.repository.UniqueFileRepository;
+import priv.henryyu.privatebox.repository.UserRepository;
 import priv.henryyu.privatebox.tools.Encrypt;
 import priv.henryyu.privatebox.tools.FileDownloadUtil;
 import priv.henryyu.privatebox.tools.FileUploadUtil;
@@ -60,6 +61,8 @@ public class FileService extends BaseComponent {
 	private UniqueFileRepository uniqueFileRepository;
 	@Autowired
 	private FileRepository fileRepository;
+	@Autowired
+	private UserRepository userRepository;
 	private static final String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()
 			+ "files/";
 	/**
@@ -102,13 +105,16 @@ public class FileService extends BaseComponent {
 			Iterable<File> files = fileRepository.findAll(ids);
 			for (File file : files) {
 				file.setDeleted(true);
+				getUser().setUsedSize(getUser().getUsedSize()-file.getSize());
 			}
+			userRepository.save(getUser());
 			fileRepository.save(files);
 			responseMessage.setCode(ResponseCode.Success);
 		} catch (Exception e) {
 			e.printStackTrace();
 			responseMessage.setCode(ResponseCode.Exception);
 		}
+		
 		return responseMessage;
 	}
 	/**
@@ -121,6 +127,10 @@ public class FileService extends BaseComponent {
 	*/
 	public ResponseMessage upload(MultipartFile file) {
 		ResponseMessage responseMessage = new ResponseMessage();
+		if(getUser().getUsedSize()+file.getSize()<getUser().getTotalSize()) {
+			responseMessage.setCode(ResponseCode.NotEnoughtSize);
+			return responseMessage;
+		}
 		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files";
 		String encryptFileName;
 		try {
@@ -148,6 +158,8 @@ public class FileService extends BaseComponent {
 				e.printStackTrace();
 			}
 		});
+		getUser().setUsedSize(getUser().getUsedSize()+file.getSize());
+		userRepository.save(getUser());
 		return responseMessage;
 	}
 	/**
@@ -219,6 +231,8 @@ public class FileService extends BaseComponent {
 				uniqueFile.getSize(), getUser().getUsername());
 		responseMessage.setCode(ResponseCode.FileExist);
 		fileRepository.save(saveFile);
+		getUser().setUsedSize(getUser().getUsedSize()+uniqueFile.getSize());
+		userRepository.save(getUser());
 		return responseMessage;
 	}
 

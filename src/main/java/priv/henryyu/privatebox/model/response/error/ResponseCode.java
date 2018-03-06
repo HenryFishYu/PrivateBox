@@ -18,6 +18,7 @@ public enum ResponseCode {
 	IllegalFileRequest,
 	OutOfTimeLimit,
 	UserAlreadyActived,
+	NotEnoughtSize,
 	Exception;
 
 	

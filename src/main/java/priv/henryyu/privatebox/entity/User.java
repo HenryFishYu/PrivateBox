@@ -42,6 +42,8 @@ public class User implements Serializable,UserDetails{
 	private boolean accountNonLocked;
 	private boolean credentialsNonExpired;
 	private boolean enabled;
+	private double totalSize;
+	private double usedSize;
 	private Timestamp createTime;
 	@ManyToMany(cascade = {CascadeType.REFRESH},fetch = FetchType.EAGER)
     private List<Role> roles=new LinkedList<Role>();
@@ -52,6 +54,24 @@ public class User implements Serializable,UserDetails{
 		accountNonLocked=true;
 		credentialsNonExpired=true;
 		enabled=true;
+		totalSize=1073741824;
+		usedSize=0;
+	}
+	
+	public double getTotalSize() {
+		return totalSize;
+	}
+
+	public void setTotalSize(double totalSize) {
+		this.totalSize = totalSize;
+	}
+
+	public double getUsedSize() {
+		return usedSize;
+	}
+
+	public void setUsedSize(double usedSize) {
+		this.usedSize = usedSize;
 	}
 
 	public List<Role> getRoles() {

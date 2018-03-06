@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
+import priv.henryyu.privatebox.siglton.Siglton;
 
 /**
  * XXX class
@@ -46,6 +47,7 @@ public class Consumer {
 		helper.setSubject("Welcome Register PrivateBox");
 		helper.setText("<html><body><a href='"+activeURL+"'>"+activeURL+"</a></body></html>", true);
 		mailSender.send(mimeMessage);
+		Siglton.INSTANCE.getRegisterExpiringMap().get(registerEmailEntity.getRegisterUsername()).setSend(true);
     } 
 }
  

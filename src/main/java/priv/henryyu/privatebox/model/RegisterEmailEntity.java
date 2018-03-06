@@ -7,11 +7,21 @@ public class RegisterEmailEntity implements Serializable{
 	private int totalRequestTimes;
 	private String activationCode;
 	private String registerUsername;
+	private boolean send;
 	public RegisterEmailEntity() {
+		this.send=false;
 		this.totalRequestTimes = 1;
 		this.activationCode = UUID.randomUUID().toString();
 	}
 	
+	public boolean isSend() {
+		return send;
+	}
+
+	public void setSend(boolean send) {
+		this.send = send;
+	}
+
 	public String getRegisterUsername() {
 		return registerUsername;
 	}

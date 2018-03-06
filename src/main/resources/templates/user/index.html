@@ -101,19 +101,22 @@
         	form.append($("<input></input>").attr("type", "hidden").attr("name", "${_csrf.parameterName}").attr("value", "${_csrf.token}"))
         	form.appendTo('body').submit().remove(); 
 	}
-	
+	$('#size-progressbar').progressbar('setValue', ${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getUsedSize()}/${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getTotalSize()});
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
    <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a>
 </@authorize>
+ 
 <div id="upload-files-div"></div>
 <a id="open-upload-file-button" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
 <a id="logout-button" class="easyui-linkbutton" data-options="iconCls:'icon-remove'"><@spring.message 'logout' /></a>
+<div class="easyui-layout" data-options="fit : true,border : false" >
 <form action="../logout" method="post" id="logout-form" style="display:none">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 </form>
-	<div class="easyui-layout" data-options="fit : true,border : false">
+
 		<div data-options="region:'north',border:false" style="height: 40px; overflow: hidden;">
+			<div id="size-progressbar" data-options="border : false" class="easyui-progressbar" style="width:200px;float:right"></div>
 			<form id="searchForm">
 				<table style="">
 					<tr>

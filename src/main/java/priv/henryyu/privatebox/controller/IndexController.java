@@ -37,4 +37,9 @@ public class IndexController extends BaseComponent{
 	public ResponseMessage activeAccount(String registerUsername,String activationCode) {
 		return userService.activeAccount(registerUsername, activationCode);
 	}
+	@RequestMapping("/spider")
+	@ResponseBody
+	public String spider() {
+		return "anti-spider";
+	}
 }

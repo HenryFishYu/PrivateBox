@@ -141,15 +141,22 @@ public class UserService extends BaseComponent implements UserDetailsService {
 		RegisterEmailEntity registerEmailEntity=Siglton.INSTANCE.getRegisterExpiringMap().get(registerUsername);
 		if(registerEmailEntity==null) {
 			responseMessage.setCode(ResponseCode.OutOfTimeLimit);
+			return responseMessage;
+		}
+		if(!registerEmailEntity.isSend()) {
+			responseMessage.setCode(ResponseCode.IllegalInput);
+			return responseMessage;
 		}
 		if(!registerEmailEntity.getActivationCode().equals(activationCode)) {
 			responseMessage.setCode(ResponseCode.UserAlreadyActived);
+			return responseMessage;
 		}
 		if(registerEmailEntity!=null&&registerEmailEntity.getActivationCode().equals(activationCode)) {
 			Siglton.INSTANCE.getRegisterExpiringMap().remove(registerUsername);
 			responseMessage.setCode(ResponseCode.Success);
 			user.setEnabled(true);
 			userRepository.save(user);
+			return responseMessage;
 		}
 		
 		return responseMessage;
