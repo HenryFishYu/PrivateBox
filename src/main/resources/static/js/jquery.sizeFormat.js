@@ -3,7 +3,7 @@
  */
 jQuery.extend({
 			formatSize:function (value) {
-				if(null==value||value==''){
+				if(null==value||value==''||value==0||value=='0'){
 			        return "0 Bytes";
 			    }
 			    var unitArr = new Array("Bytes","KB","MB","GB","TB","PB","EB","ZB","YB");

@@ -2,11 +2,20 @@
 <@header title="User">  
 </@header>
 <script type="text/javascript">
+var usedSize;
+var totalSize;
 	$(document).ready(function(){
 		$.ajaxSetup({
 	    	data:{ "${_csrf.parameterName}" : "${_csrf.token}" }
 	    });
-
+		usedSize="${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getUsedSize()}";
+		usedSize=usedSize.replace(/,/g,"");
+		usedSize=Number(usedSize);
+		totalSize="${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getTotalSize()}";
+		totalSize=totalSize.replace(/,/g,"");
+		totalSize=Number(totalSize);
+		refreshStorage();
+		
 		$('#upload-files-div').window({
 			title:'upload',
 		    width:800,
@@ -63,6 +72,7 @@
 		var fileArray=dataGrid.datagrid('getSelections');
 		for(var i=0;i<fileArray.length;i++){
 			idArray.push(fileArray[i].id);
+			console.log(fileArray[i]);
 		}
 		$.ajax({
     	    url: "${ctx}/file/delete",
@@ -73,10 +83,14 @@
     	    dataType: "json",
     	    success: function(responseMessage) {
     	    	if(responseMessage.code=="Success"){
+    	    		for(var i=0;i<fileArray.length;i++){
+    	    			updateUsedSizeAndRefreshStorage(-fileArray[i].size);
+    	    		}
     	    		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
     	    		dataGrid.datagrid('clearSelections');
     	    		return;
     	    	}
+    	    	
     	    	$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
     	    },
     	    error:function(){
@@ -101,7 +115,17 @@
         	form.append($("<input></input>").attr("type", "hidden").attr("name", "${_csrf.parameterName}").attr("value", "${_csrf.token}"))
         	form.appendTo('body').submit().remove(); 
 	}
-	$('#size-progressbar').progressbar('setValue', ${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getUsedSize()}/${SPRING_SECURITY_CONTEXT.getAuthentication().getPrincipal().getTotalSize()});
+	function updateUsedSizeAndRefreshStorage(usedSizeChange){
+		usedSize+=usedSizeChange;
+		refreshStorage();
+	}
+	function refreshStorage(){
+		$('#size-progressbar').progressbar({
+		    text:$.formatSize(usedSize)+"/"+$.formatSize(totalSize),
+		    value:usedSize*100/totalSize
+		});
+	}
+	
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
    <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a>

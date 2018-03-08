@@ -18,8 +18,7 @@ function addReadyFilesFun(){
 function addFinishedFilesFun(){
 	finishedFilesNumber++;
 	if(finishedFilesNumber==totalFilesNumber){
-		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
-		dataGrid.datagrid('clearSelections');
+		
 	}
 }
 function startUpload(){
@@ -43,12 +42,19 @@ WebUploader.Uploader.register({
     	    dataType: "json",
     	    success: function(responseMessage) {
     	    	if(responseMessage.code=="FileExist"){
+    	    		console.log(file);
+    	    		updateUsedSizeAndRefreshStorage(file.size);
     	    		addFinishedFilesFun();
     	    		owner.skipFile(file);
     	    		uploadGrid.datagrid('updateRow',
-    	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'上传完成'}});
+    	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'<@spring.message 'uploadFinished' />'}});
     	    		uploadGrid.datagrid('updateRow',
     	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{progress:(100).toFixed(2)}});
+    	    		deferred.reject();
+    	    	}
+    	    	if(responseMessage.code=="NotEnoughSize"){
+    	    		uploadGrid.datagrid('updateRow',
+    	                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'<@spring.message 'NotEnoughStorageSize' />'}});
     	    		deferred.reject();
     	    	}
     	    	console.log(responseMessage);
@@ -65,13 +71,20 @@ WebUploader.Uploader.register({
 $(document).ready(function(){
 
 	uploader.on( 'fileQueued', function( file ) {
-		addTotalFilesFun();
-        var fileSize = $.formatSize(file.size);
+		var fileSize = $.formatSize(file.size);
         var row =  {fileId:file.id,fileName:file.name,fileSize:fileSize,pieceSHA512:'0%',progress:0,fileState:"等待上传"};
         uploadGrid.datagrid('insertRow', {
             index: 0,
             row:row
         });
+		if(file.size>totalSize-usedSize){
+			uploadGrid.datagrid('updateRow',
+                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'<@spring.message 'NotEnoughStorageSize' />'}});
+			uploader.skipFile(file);
+			return;
+		}
+		addTotalFilesFun();
+        
         var reader = new FileReader();
         reader.readAsArrayBuffer(file.source.source);
         reader.onprogress=function(event){
@@ -96,13 +109,22 @@ $(document).ready(function(){
                 {index:uploadGrid.datagrid('getRowIndex',file.id),row:{progress:(percentage * 100).toFixed(2)}});
     });
 	uploader.on('uploadSuccess',function(file,responseMessage){
+		console.log(responseMessage);
 		if(responseMessage=="Error"){
 			$.messager.alert('<@spring.message 'message' />', '<@spring.message 'error' />', 'info');
 			return;
 		}
+		if(responseMessage.code=="NotEnoughSize"){
+    		uploadGrid.datagrid('updateRow',
+                    {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'<@spring.message 'NotEnoughStorageSize' />'}});
+    		return;
+		}
 		uploadGrid.datagrid('updateRow',
-                {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'上传完成'}});
+                {index:uploadGrid.datagrid('getRowIndex',file.id),row:{fileState:'<@spring.message 'uploadFinished' />'}});
 		addFinishedFilesFun();
+		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
+		dataGrid.datagrid('clearSelections');
+		updateUsedSizeAndRefreshStorage(file.size);
 	});
 	/* uploader.on('uploadError',function(file){
 			$.messager.alert('<@spring.message 'message' />', '222<@spring.message 'error' />', 'info');
@@ -133,7 +155,7 @@ $(document).ready(function(){
                  '</div>';
                  return htmlstr;
             }},       
-            { title: '上传状态',field: 'fileState',width: 80,fixed:true},  
+            { title: '上传状态',field: 'fileState',width: 120,fixed:true},  
         ]]
     });
     $("#add-files").click(function(){

@@ -127,8 +127,8 @@ public class FileService extends BaseComponent {
 	*/
 	public ResponseMessage upload(MultipartFile file) {
 		ResponseMessage responseMessage = new ResponseMessage();
-		if(getUser().getUsedSize()+file.getSize()<getUser().getTotalSize()) {
-			responseMessage.setCode(ResponseCode.NotEnoughtSize);
+		if(getUser().getUsedSize()+file.getSize()>getUser().getTotalSize()) {
+			responseMessage.setCode(ResponseCode.NotEnoughSize);
 			return responseMessage;
 		}
 		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files";
@@ -225,6 +225,10 @@ public class FileService extends BaseComponent {
 		UniqueFile uniqueFile = uniqueFileRepository.findOne(encryptFileName);
 		if (uniqueFile == null) {
 			responseMessage.setCode(ResponseCode.FileNotExist);
+			return responseMessage;
+		}
+		if(getUser().getUsedSize()+uniqueFile.getSize()>getUser().getTotalSize()) {
+			responseMessage.setCode(ResponseCode.NotEnoughSize);
 			return responseMessage;
 		}
 		File saveFile = FileUtil.getFileByUniqueFileAndOriginalFilename(uniqueFile, originalFilename,
