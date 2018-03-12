@@ -13,16 +13,38 @@ import javax.persistence.Id;
  * @version 1.0.0
  */
 public class FileQueryForm extends PaginationForm {
-	
-	private Timestamp createTime;
+	private static final String empty="";
+	private String beginCreateTime;
+	private String endCreateTime;
 	private String originalName;
 	private String extension;
 	
 	
 
-	public void setCreateTime(Timestamp createTime) {
-		this.createTime = createTime;
+	public String getBeginCreateTime() {
+		return beginCreateTime;
 	}
+
+	public void setBeginCreateTime(String beginCreateTime) {
+		if(empty.equals(beginCreateTime)) {
+			this.beginCreateTime = "1970-01-01 00:00:00";
+			return;
+		}
+		this.beginCreateTime = beginCreateTime+" 00:00:00";
+	}
+
+	public String getEndCreateTime() {
+		return endCreateTime;
+	}
+
+	public void setEndCreateTime(String endCreateTime) {
+		if(empty.equals(endCreateTime)) {
+			this.endCreateTime = "2020-01-01 00:00:00";
+			return;
+		}
+		this.endCreateTime = endCreateTime+" 00:00:00";
+	}
+
 	public String getOriginalName() {
 		return originalName;
 	}
@@ -42,9 +64,6 @@ public class FileQueryForm extends PaginationForm {
 		this.extension = extension;
 	}
 
-	public Timestamp getCreateTime() {
-		return createTime;
-	}
 }
  
 

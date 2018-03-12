@@ -125,7 +125,13 @@ var totalSize;
 		    value:usedSize*100/totalSize
 		});
 	}
-	
+	function timeStampFormatter(date){
+		console.log(date.getTime());
+		var y = date.getFullYear();
+		var m = date.getMonth()+1;
+		var d = date.getDate();
+		return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+	}
 </script>
 <@authorize ifAnyGranted="ROLE_ADMIN">
    <a href="../admin/index" class="easyui-linkbutton" data-options="iconCls:'icon-man'"><@spring.message 'admin' /></a>
@@ -148,6 +154,10 @@ var totalSize;
 						<td width="140px"><input name="originalName" type="text"  style="width:135px" autocomplete="off"/></td>
 						<td style="text-align:right;"><@spring.message 'fileExtension' />:</td>
 						<td width="140px"><input name="extension" type="text"  style="width:135px" autocomplete="off"/></td>
+						<td style="text-align:right;"><@spring.message 'beginCreateTime' />:</td>
+						<td width="140px"><input class="easyui-datebox" name="beginCreateTime" data-options="formatter:timeStampFormatter,editable:false" style="width:100%;"></td>
+						<td style="text-align:right;"><@spring.message 'endCreateTime' />:</td>
+						<td width="140px"><input class="easyui-datebox" name="endCreateTime" data-options="formatter:timeStampFormatter,editable:false" style="width:100%;"></td>
 						<!-- <td style="text-align:right;">银行编号</td>
 						<td width="140px"><input name="bankCode" type="text"  style="width:135px" autocomplete="off"/></td> -->
 						<td style="padding-left:10px">

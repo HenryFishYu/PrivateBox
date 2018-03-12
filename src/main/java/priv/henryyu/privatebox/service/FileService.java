@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,9 +86,9 @@ public class FileService extends BaseComponent {
 			Sort sort = new Sort(Direction.fromString(fileQueryForm.getOrder()), fileQueryForm.getSort());
 			pageable = new PageRequest(fileQueryForm.getPage() - 1, fileQueryForm.getRows(), sort);
 		}
-		Page<File> page = fileRepository.findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeleted(
+		Page<File> page = fileRepository.findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeletedAndCreateTimeBetween(
 				getUser().getUsername(), "%" + fileQueryForm.getOriginalName() + "%",
-				"%" + fileQueryForm.getExtension() + "%", false, pageable);
+				"%" + fileQueryForm.getExtension() + "%", false,Timestamp.valueOf(fileQueryForm.getBeginCreateTime()),Timestamp.valueOf(fileQueryForm.getEndCreateTime()), pageable);
 		dataGrid.setRows(page.getContent());
 		dataGrid.setTotal(page.getTotalElements());
 		return dataGrid;

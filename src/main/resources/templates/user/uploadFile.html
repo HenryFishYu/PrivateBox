@@ -143,10 +143,10 @@ $(document).ready(function(){
         columns:[[
             { field:'ck',checkbox:true },
             { title: 'fileId', field: 'fileId',hidden:true,width:100},
-            { title: '文件名称',field: 'fileName',width: 230,fixed:true},
-            { title: '文件大小',field: 'fileSize',width: 80,fixed:true},  
-            { title: '文件验证',field: 'pieceSHA512',width: 60,fixed:true},  
-            { title: '上传进度',field: 'progress',width: 180,fixed:true,formatter: function (value, rec){
+            { title: '<@spring.message 'fileName' />',field: 'fileName',width: 230,fixed:true},
+            { title: '<@spring.message 'fileSize' />',field: 'fileSize',width: 80,fixed:true},  
+            { title: '<@spring.message 'fileVerification' />',field: 'pieceSHA512',width: 60,fixed:true},  
+            { title: '<@spring.message 'uploadProgress' />',field: 'progress',width: 180,fixed:true,formatter: function (value, rec){
                  var htmlstr = '<div class="easyui-progressbar progressbar" style="width: 170px; height: 20px;" value="'+value +'" text="'+value+'%">'+
                  '<div class="progressbar-text" style="width: 170px; height: 20px; line-height: 20px;">'+value+'%</div>'+
                      '<div class="progressbar-value" style="width: '+value+'%; height: 20px; line-height: 20px;">'+
@@ -155,7 +155,7 @@ $(document).ready(function(){
                  '</div>';
                  return htmlstr;
             }},       
-            { title: '上传状态',field: 'fileState',width: 120,fixed:true},  
+            { title: '<@spring.message 'uploadStatus' />',field: 'fileState',width: 120,fixed:true},  
         ]]
     });
     $("#add-files").click(function(){
@@ -196,9 +196,9 @@ var uploader = WebUploader.create({
   <div class="easyui-layout" data-options="fit:true">  
         <div data-options="region:'center'">
             <div class="easyui-panel"  style="height: 27px;" data-options="border:false">
-                <a class="easyui-linkbutton" id="add-files" data-options="iconCls:'icon-add'" style="height: 25px;width: 150px;">添加文件</a>
-                <a class="easyui-linkbutton" id="remove-files" data-options="iconCls:'icon-remove'" style="height: 25px;width: 150px;">移除文件</a>
-                <a class="easyui-linkbutton" id="upload-files" data-options="iconCls:'icon-save'" disabled=true style="height: 25px;width: 150px;" onclick="startUpload();">开始上传</a>
+                <a class="easyui-linkbutton" id="add-files" data-options="iconCls:'icon-add'" style="height: 25px;width: 150px;"><@spring.message 'addFiles' /></a>
+                <a class="easyui-linkbutton" id="remove-files" data-options="iconCls:'icon-remove'" style="height: 25px;width: 150px;"><@spring.message 'removeFiles' /></a>
+                <a class="easyui-linkbutton" id="upload-files" data-options="iconCls:'icon-save'" disabled=true style="height: 25px;width: 150px;" onclick="startUpload();"><@spring.message 'startUpload' /></a>
              </div>
             <table id="upload-files-grid"></table>
         </div>

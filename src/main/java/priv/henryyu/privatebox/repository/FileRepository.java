@@ -1,5 +1,8 @@
 package priv.henryyu.privatebox.repository;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Page;
@@ -17,7 +20,7 @@ import priv.henryyu.privatebox.entity.File;
  * @version 1.0.0
  */
 public interface FileRepository extends PagingAndSortingRepository<File, String> {
-	public Page<File> findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeleted(String username,String originalName,String extension,Boolean deleted,Pageable pageable);
+	public Page<File> findByUsernameAndOriginalNameLikeAndExtensionLikeAndDeletedAndCreateTimeBetween(String username,String originalName,String extension,Boolean deleted,Timestamp beginCreateTime,Timestamp endCreateTime,Pageable pageable);
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	public File findById(String id);
 }
