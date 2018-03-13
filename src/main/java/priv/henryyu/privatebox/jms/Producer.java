@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import priv.henryyu.privatebox.entity.InvitationCode;
 import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
 
@@ -32,6 +33,9 @@ public class Producer {
     }
     public void sendMessage(Destination destination, final RegisterEmailEntity message){  
         jmsTemplate.convertAndSend(destination, message);  
+    }
+    public void sendMessage(Destination destination, final InvitationCode invitationCode){  
+        jmsTemplate.convertAndSend(destination, invitationCode);  
     }
 }
  

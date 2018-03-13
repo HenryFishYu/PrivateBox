@@ -40,7 +40,6 @@
         <artifactId>spring-boot-starter-freemarker</artifactId>
     </dependency>
 
-
     <!-- Spring boot 核心web-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

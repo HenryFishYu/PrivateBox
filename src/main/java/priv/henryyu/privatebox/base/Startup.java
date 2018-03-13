@@ -13,8 +13,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import priv.henryyu.privatebox.controller.UserController;
+import priv.henryyu.privatebox.entity.InvitationCode;
+import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.service.UserService;
+import priv.henryyu.privatebox.siglton.Siglton;
 
 /**
  * XXX class
@@ -24,27 +27,33 @@ import priv.henryyu.privatebox.service.UserService;
  * @version 1.0.0
  */
 @Component
-public class Startup implements CommandLineRunner{
+public class Startup implements CommandLineRunner {
 
 	@Autowired
 	private UserService userService;
 	@Autowired
 	private RoleRepository roleRepository;
+	@Autowired
+	private InvitationCodeRepository invitationCodeRepository;
 
 	@Override
 	public void run(String... arg0) throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println("Is first time run this application:"+userService.isFirstTime());
-		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath()+"files";
-		File folder=new File(path);
-		if(!folder.exists()) {
+		boolean isFirstTime = userService.isFirstTime();
+		System.out.println("Is first time run this application:" + isFirstTime);
+		String path = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "files";
+		File folder = new File(path);
+		if (!folder.exists()) {
 			folder.mkdir();
 			System.out.println("Generate File Folder");
 		}
+		if (!isFirstTime) {
+			for (InvitationCode invitationCode : invitationCodeRepository.findAll()) {
+				Siglton.INSTANCE.getInvitationCodeMap().put(invitationCode.getCode(), invitationCode);
+			}
+		}
 		System.out.println("PrivateBox Run");
-		
+
 	}
 
 }
- 
-

@@ -1,10 +1,16 @@
 package priv.henryyu.privatebox.siglton;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import priv.henryyu.privatebox.entity.InvitationCode;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
 
 public enum Siglton {
@@ -16,6 +22,16 @@ public enum Siglton {
 			  .expiration(1, TimeUnit.MINUTES)
 			  .expirationPolicy(ExpirationPolicy.CREATED)
 			  .build();
+	private ConcurrentMap<String, InvitationCode> invitationCodeMap=new ConcurrentHashMap<String, InvitationCode>();
+	
+	public ExpiringMap<String, RegisterEmailEntity> getRegisterMap() {
+		return registerMap;
+	}
+	
+	public ConcurrentMap<String, InvitationCode> getInvitationCodeMap() {
+		return invitationCodeMap;
+	}
+
 	public ExpiringMap<String, RegisterEmailEntity> getRegisterExpiringMap() {
 		return registerMap;
 	}

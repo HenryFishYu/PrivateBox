@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import priv.henryyu.privatebox.entity.InvitationCode;
 import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
+import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 import priv.henryyu.privatebox.siglton.Siglton;
 
@@ -29,6 +31,8 @@ import priv.henryyu.privatebox.siglton.Siglton;
 public class Consumer {
 	@Autowired
 	private LoginDetailsRepository loginDetailsRepository;
+	@Autowired
+	private InvitationCodeRepository invitationCodeRepository;
 	@Autowired
 	private JavaMailSender mailSender;
 	@JmsListener(destination = "loginDetails.queue")  
@@ -48,6 +52,10 @@ public class Consumer {
 		helper.setText("<html><body><a href='"+activeURL+"'>"+activeURL+"</a></body></html>", true);
 		mailSender.send(mimeMessage);
 		Siglton.INSTANCE.getRegisterExpiringMap().get(registerEmailEntity.getRegisterUsername()).setSend(true);
+    } 
+	@JmsListener(destination = "invitationCode.queue")  
+    public void receiveQueue(InvitationCode invitationCode) throws MessagingException {
+		invitationCodeRepository.save(invitationCode);
     } 
 }
  

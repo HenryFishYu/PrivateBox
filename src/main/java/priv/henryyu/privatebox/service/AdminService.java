@@ -33,6 +33,7 @@ import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.model.response.error.ResponseCode;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.UserRepository;
+import priv.henryyu.privatebox.siglton.Siglton;
 
 /**
  * XXX class
@@ -75,6 +76,7 @@ public class AdminService extends BaseComponent {
 		for (int i = 0; i < intAmount; i++) {
 			InvitationCode invitationCode = new InvitationCode();
 			invitationCode.setCreateUsername(getUser().getUsername());
+			Siglton.INSTANCE.getInvitationCodeMap().put(invitationCode.getCode(), invitationCode);
 			invitationCodes.add(invitationCode);
 		}
 		invitationCodeRepository.save(invitationCodes);

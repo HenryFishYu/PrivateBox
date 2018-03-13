@@ -99,7 +99,7 @@ public class UserService extends BaseComponent implements UserDetailsService {
 			responseMessage.setCode(ResponseCode.UserAlreadyExist);
 			return responseMessage;
 		}
-		InvitationCode invitationCode = invitationCodeRepository.findOne(registerUser.getInvitationCode());
+		InvitationCode invitationCode = Siglton.INSTANCE.getInvitationCodeMap().get(registerUser.getInvitationCode());
 		if (invitationCode == null) {
 			String message = messageSource.getMessage("errorInvitationCode", null, locale);
 			responseMessage.setMessage(message);
@@ -121,7 +121,9 @@ public class UserService extends BaseComponent implements UserDetailsService {
 		invitationCode.setUsedUsername(savedUser.getUsername());
 		invitationCode.setUsed(true);
 		invitationCode.setUsedTime(new Timestamp(System.currentTimeMillis()));
-		invitationCodeRepository.save(invitationCode);
+		Destination destination = new ActiveMQQueue("invitationCode.queue"); 
+        producer.sendMessage(destination, invitationCode);
+		//invitationCodeRepository.save(invitationCode); save Entity with ActiveMQ
 		responseMessage.setCode(ResponseCode.Success);
 		String message = messageSource.getMessage("registerSuccess", null, locale);
 		responseMessage.setMessage(message + "------" + savedUser.getUsername());
@@ -133,11 +135,6 @@ public class UserService extends BaseComponent implements UserDetailsService {
 	}
 	public ResponseMessage activeAccount(String registerUsername,String activationCode) {
 		ResponseMessage responseMessage=new ResponseMessage();
-		User user=userRepository.findByUsername(registerUsername);
-		if(user==null) {
-			responseMessage.setCode(ResponseCode.Exception);
-			return responseMessage;
-		}
 		RegisterEmailEntity registerEmailEntity=Siglton.INSTANCE.getRegisterExpiringMap().get(registerUsername);
 		if(registerEmailEntity==null) {
 			responseMessage.setCode(ResponseCode.OutOfTimeLimit);
@@ -147,10 +144,16 @@ public class UserService extends BaseComponent implements UserDetailsService {
 			responseMessage.setCode(ResponseCode.IllegalInput);
 			return responseMessage;
 		}
-		if(!registerEmailEntity.getActivationCode().equals(activationCode)) {
+		User user=userRepository.findByUsername(registerUsername);
+		if(user==null) {
+			responseMessage.setCode(ResponseCode.Exception);
+			return responseMessage;
+		}
+		if(user.isEnabled()) {
 			responseMessage.setCode(ResponseCode.UserAlreadyActived);
 			return responseMessage;
 		}
+
 		if(registerEmailEntity!=null&&registerEmailEntity.getActivationCode().equals(activationCode)) {
 			Siglton.INSTANCE.getRegisterExpiringMap().remove(registerUsername);
 			responseMessage.setCode(ResponseCode.Success);
@@ -171,7 +174,9 @@ public class UserService extends BaseComponent implements UserDetailsService {
 			Destination destination = new ActiveMQQueue("sendEmail.queue"); 
 	        producer.sendMessage(destination, registerEmailEntity);
 	        responseMessage.setCode(ResponseCode.Success);
-		}else if(registerEmailEntity!=null){
+	        return responseMessage;
+		}
+		if(registerEmailEntity!=null){
 			if(registerEmailEntity.getTotalRequestTimes()<3) {
 			registerEmailEntity.setTotalRequestTimes(registerEmailEntity.getTotalRequestTimes()+1);
 			Destination destination = new ActiveMQQueue("sendEmail.queue"); 
@@ -182,8 +187,10 @@ public class UserService extends BaseComponent implements UserDetailsService {
 				responseMessage.setCode(ResponseCode.Exception);
 				responseMessage.setMessage("Too Many Request");
 			}
-		}	
+			return responseMessage;
+		}
 		return responseMessage;
+		
 	}
 	/**
 	 * 初始化权限操作 Authority Initialization
