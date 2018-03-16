@@ -29,10 +29,12 @@ public class OnAuthenticationFailureHandler implements AuthenticationFailureHand
 		httpServletResponse.setContentType("application/json;charset=utf-8");
 		PrintWriter out = httpServletResponse.getWriter();
 		if(e instanceof BadCredentialsException) {
-        	
+			out.write("{\"status\":\"error\"}");
+            out.flush();
+            out.close();
         }
         if(e instanceof DisabledException) {
-            out.write("{\"status\":\"error\"}");
+            out.write("{\"status\":\"unactive\"}");
             out.flush();
             out.close();
         }

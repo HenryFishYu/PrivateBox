@@ -13,9 +13,11 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import priv.henryyu.privatebox.entity.Chat;
 import priv.henryyu.privatebox.entity.InvitationCode;
 import priv.henryyu.privatebox.entity.LoginDetails;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
+import priv.henryyu.privatebox.repository.ChatRepository;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.LoginDetailsRepository;
 import priv.henryyu.privatebox.siglton.Siglton;
@@ -33,6 +35,8 @@ public class Consumer {
 	private LoginDetailsRepository loginDetailsRepository;
 	@Autowired
 	private InvitationCodeRepository invitationCodeRepository;
+	@Autowired
+	private ChatRepository chatRepository;
 	@Autowired
 	private JavaMailSender mailSender;
 	@JmsListener(destination = "loginDetails.queue")  
@@ -57,6 +61,10 @@ public class Consumer {
     public void receiveQueue(InvitationCode invitationCode) throws MessagingException {
 		invitationCodeRepository.save(invitationCode);
     } 
+    @JmsListener(destination = "groupChat.queue")  
+    public void receiveQueue(Chat chat) throws MessagingException {
+    	chatRepository.save(chat);
+    }
 }
  
 

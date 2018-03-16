@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import priv.henryyu.privatebox.entity.InvitationCode;
+import priv.henryyu.privatebox.entity.User;
 import priv.henryyu.privatebox.model.RegisterEmailEntity;
 
 public enum Siglton {
@@ -23,13 +24,17 @@ public enum Siglton {
 			  .expirationPolicy(ExpirationPolicy.CREATED)
 			  .build();
 	private ConcurrentMap<String, InvitationCode> invitationCodeMap=new ConcurrentHashMap<String, InvitationCode>();
-	
+	private ConcurrentMap<String, User> userUUIDMap=new ConcurrentHashMap<String, User>();
 	public ExpiringMap<String, RegisterEmailEntity> getRegisterMap() {
 		return registerMap;
 	}
 	
 	public ConcurrentMap<String, InvitationCode> getInvitationCodeMap() {
 		return invitationCodeMap;
+	}
+	
+	public ConcurrentMap<String, User> getUserUUIDMapMap() {
+		return userUUIDMap;
 	}
 
 	public ExpiringMap<String, RegisterEmailEntity> getRegisterExpiringMap() {

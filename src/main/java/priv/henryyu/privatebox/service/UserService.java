@@ -128,7 +128,6 @@ public class UserService extends BaseComponent implements UserDetailsService {
 		String message = messageSource.getMessage("registerSuccess", null, locale);
 		responseMessage.setMessage(message + "------" + savedUser.getUsername());
 		getSession().setAttribute("registerUsername", savedUser.getUsername());
-		sendActiveEmail(user.getUsername());
 		// jpaResponseMessage.setData(savedUser);
 		return responseMessage;
 

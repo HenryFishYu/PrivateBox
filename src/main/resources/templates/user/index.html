@@ -17,7 +17,7 @@ var totalSize;
 		refreshStorage();
 		
 		$('#upload-files-div').window({
-			title:'upload',
+			title:'<@spring.message 'upload' />',
 		    width:800,
 		    height:400,
 		    href:'showUploadFile',
@@ -29,6 +29,9 @@ var totalSize;
 		$("#logout-button").click(function(){
 			$("#logout-form").submit();
 		});
+		$("#group-chat-button").click(function(){
+			window.open("${ctx}/user/groupChat");
+		})
 		dataGrid = $("#download-files-grid").datagrid({
 			url : '${ctx}/user/queryFiles',
 			queryParams:$('#searchForm').serializeObject(),
@@ -140,6 +143,7 @@ var totalSize;
 <div id="upload-files-div"></div>
 <a id="open-upload-file-button" class="easyui-linkbutton" data-options="iconCls:'icon-add'"><@spring.message 'upload' /></a>
 <a id="logout-button" class="easyui-linkbutton" data-options="iconCls:'icon-remove'"><@spring.message 'logout' /></a>
+<a id="group-chat-button" class="easyui-linkbutton"><@spring.message 'groupChat' /></a>
 <div class="easyui-layout" data-options="fit : true,border : false" >
 <form action="../logout" method="post" id="logout-form" style="display:none">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

@@ -11,6 +11,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import priv.henryyu.privatebox.netty.handler.TextWebSocketFrameHandler;
 /**
  * LocaleConfig class
  * 
@@ -40,6 +42,7 @@ public class LocaleConfig extends WebMvcConfigurerAdapter {
         lci.setParamName("language");
         return lci;
     }
+    
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

@@ -25,9 +25,15 @@
 	    	    	console.log(result);
 	    	    	if(result.status=="success"){
 	    	    		window.location.href="user/index";
+	    	    		return;
 	    	    	}
 	    	    	if(result.status=="error"){
-	    	    		$.messager.alert('<@spring.message 'message' />', "error", 'info');
+	    	    		$.messager.alert('<@spring.message 'message' />', "error username or password", 'info');
+	   					return;
+	    	    	}
+	    	    	if(result.status=="unactive"){
+	    	    		$.messager.alert('<@spring.message 'message' />', "please active your account by email", 'info');
+	   					return;
 	    	    	}
 	    	    },
 	    	    error:function(){

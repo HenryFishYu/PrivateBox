@@ -2,6 +2,9 @@ package priv.henryyu.privatebox.controller;
 
 
 
+import java.security.SecureRandom;
+import java.util.UUID;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import priv.henryyu.privatebox.model.response.DataGrid;
 import priv.henryyu.privatebox.model.response.ResponseMessage;
 import priv.henryyu.privatebox.service.FileService;
 import priv.henryyu.privatebox.service.UserService;
+import priv.henryyu.privatebox.siglton.Siglton;
 /**
  * UserController class
  * 
@@ -61,6 +65,9 @@ public class UserController extends BaseComponent{
 	@RequestMapping("/index")
 	public ModelAndView index() {
 		log.info(getUser().getUsername()+"--login");
+		String userUUID=UUID.randomUUID().toString();
+		getSession().setAttribute("userUUID", userUUID);
+		Siglton.INSTANCE.getUserUUIDMapMap().put(userUUID, getUser());
 		ModelAndView modelAndView=new ModelAndView("user/index");
 		return modelAndView;
 	}
@@ -84,6 +91,13 @@ public class UserController extends BaseComponent{
 	@ResponseBody
 	public ResponseMessage emailTest(String username) {
 		return userService.sendActiveEmail(username);
+	}
+	
+	@RequestMapping("/groupChat")
+	public ModelAndView groupChat() {
+		ModelAndView modelAndView=new ModelAndView();
+		modelAndView.setViewName("user/groupChatClient");
+		return modelAndView;
 	}
 	
 }

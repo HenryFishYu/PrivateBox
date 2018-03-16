@@ -43,6 +43,8 @@ WebUploader.Uploader.register({
     	    success: function(responseMessage) {
     	    	if(responseMessage.code=="FileExist"){
     	    		console.log(file);
+    	    		dataGrid.datagrid('reload', $('#searchForm').serializeObject());
+    	    		dataGrid.datagrid('clearSelections');
     	    		updateUsedSizeAndRefreshStorage(file.size);
     	    		addFinishedFilesFun();
     	    		owner.skipFile(file);

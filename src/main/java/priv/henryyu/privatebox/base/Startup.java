@@ -12,8 +12,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import io.netty.bootstrap.ServerBootstrap;
 import priv.henryyu.privatebox.controller.UserController;
 import priv.henryyu.privatebox.entity.InvitationCode;
+import priv.henryyu.privatebox.netty.WebsocketChatServer;
 import priv.henryyu.privatebox.repository.InvitationCodeRepository;
 import priv.henryyu.privatebox.repository.RoleRepository;
 import priv.henryyu.privatebox.service.UserService;
@@ -35,8 +37,8 @@ public class Startup implements CommandLineRunner {
 	private RoleRepository roleRepository;
 	@Autowired
 	private InvitationCodeRepository invitationCodeRepository;
-
-	@Override
+	@Autowired
+	private WebsocketChatServer websocketChatServer;
 	public void run(String... arg0) throws Exception {
 		// TODO Auto-generated method stub
 		boolean isFirstTime = userService.isFirstTime();
@@ -52,6 +54,7 @@ public class Startup implements CommandLineRunner {
 				Siglton.INSTANCE.getInvitationCodeMap().put(invitationCode.getCode(), invitationCode);
 			}
 		}
+		websocketChatServer.run();
 		System.out.println("PrivateBox Run");
 
 	}
