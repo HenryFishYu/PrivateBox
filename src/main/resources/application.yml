@@ -6,8 +6,8 @@ logging:
 spring:
   mail:  
       host: smtp.163.com  
-      username: yuhaolun8888@163.com  
-      password: hyiechyiec
+      username: 
+      password: 
       properties:  
           mail:   
               smtp:  
